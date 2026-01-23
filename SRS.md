@@ -1,51 +1,49 @@
 # Software Requirements Specification (SRS)
 ## Fake News Detection System
 
-**Version:** 1.0  
-**Date:** 2026-01-22  
-**Status:** Initial Release
+**Version:** 2.0 (Final)  
+**Date:** 2026-01-23  
+**Status:** Deployment Ready
 
 ---
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-The purpose of this document is to define the requirements for the "Fake News Detection System". This web-based application aims to identify potentially misleading or fake news articles using Machine Learning (ML) and Natural Language Processing (NLP) techniques.
+The purpose of this document is to define the comprehensive requirements for the "Fake News Detection System". This covers the entire lifecycle from initial data collection and model training to final deployment on the Render cloud platform.
 
 ### 1.2 Scope
-The system will be a web application where users can:
-- Input raw text to verify its authenticity.
-- Search for topics to analyze global news trends (simulated or API-based).
-- Input URLs to scrape and analyze specific articles.
-The system uses a Logistic Regression model trained on a labeled dataset (Real v/s Fake) to provide a prediction with a confidence score.
+The system is a full-stack web application designed to:
+- **Analyze Text:** Predict if a news article is Real or Fake using Natural Language Processing.
+- **Verify URLs:** Scrape and check external websites.
+- **Search Topics:** Fetch global news trends via API.
+- **Auto-Deploy:** Automatically build and train models on the cloud (Render).
 
-### 1.3 Definitions, Acronyms, and Abbreviations
+### 1.3 Definitions and Acronyms
 - **SRS**: Software Requirements Specification
-- **ML**: Machine Learning
+- **TF-IDF**: Term Frequency-Inverse Document Frequency
 - **NLP**: Natural Language Processing
-- **TF-IDF**: Term Frequency-Inverse Document Frequency (used for vectorization)
-- **UI**: User Interface
-- **API**: Application Programming Interface
+- **CI/CD**: Continuous Integration/Continuous Deployment
+- **Render**: The cloud Platform-as-a-Service (PaaS) provider
 
 ---
 
 ## 2. Overall Description
 
 ### 2.1 Product Perspective
-This is a standalone web application. It consists of:
-- **Frontend**: A responsive web interface (HTML/CSS/JS).
-- **Backend**: A Flask (Python) server handling requests.
-- **ML Engine**: A pre-trained Python model for classification.
+This system is an end-to-end solution:
+1.  **Development Environment**: Windows (Python 3.13), VS Code.
+2.  **Version Control**: Git & GitHub for source code management.
+3.  **Production Environment**: Linux (Python 3.11) on Render.com.
 
 ### 2.2 Product Functions
-1.  **Text Analysis**: Users paste text; the system predicts "REAL" or "FAKE".
-2.  **Confidence Scoring**: Displays a percentage indicating certainty.
-3.  **Global News Search**: Fetches headlines for a topic and analyzes them.
-4.  **URL Analysis**: Scrapes content from a given URL and analyzes it.
+- **Core Function:** Binary classification (REAL vs FAKE) with probability score.
+- **Data Ingestion:** Accepts direct text, web URLs, or API search queries.
+- **Self-Training:** The system retrains its own model during deployment to ensure version compatibility.
 
 ### 2.3 User Characteristics
-- **General Public**: People wanting to verify news they read on social media.
-- **Researchers/Journalists**: Users looking for a quick credibility check on sources.
+- **End Users:** General public checking news credibility.
+- **Admin/Developer:** Manages the GitHub repository to trigger updates.
 
 ---
 
@@ -53,65 +51,52 @@ This is a standalone web application. It consists of:
 
 ### 3.1 Functional Requirements
 
-#### FR-01: Text Input Analysis
-- **Description**: The system shall accept a text string (min 10 characters) from the user.
-- **Input**: User types/pastes text into a text area.
-- **Process**: Preprocess text (clean, tokenize) -> Vectorize -> Predict using ML model.
-- **Output**: Display "FAKE" or "REAL" label and a confidence percentage.
+#### FR-01: Data Collection & Training (Step 1)
+- **Description**: The system must include a training script (`train_model.py`) that downloads the dataset.
+- **Requirement**: Must handle 6000+ labeled news articles.
+- **Algorithm**: Logistic Regression with TF-IDF Vectorizer.
 
-#### FR-02: Global News Analysis
-- **Description**: The system shall allow users to search for a specific topic.
-- **Input**: Keyword (e.g., "Election").
-- **Process**: Fetch articles (via NewsAPI or mock simulation) -> Analyze each title/description.
-- **Output**: A list of related articles with individual credibility scores.
+#### FR-02: User Interaction (Step 2)
+- **Description**: Web interface with 3 distinct tabs (Text, API, URL).
+- **Requirement**: Must validate input (min 10 chars) and provide instant feedback.
 
-#### FR-03: URL Verification
-- **Description**: The system shall accept a valid URL.
-- **Input**: A standard HTTP/HTTPS URL.
-- **Process**: Fetch HTML -> Extract text content (paragraphs) -> Analyze text.
-- **Output**: Prediction based on the scraped content.
+#### FR-03: Backend Processing (Step 3)
+- **Description**: Flask server exposes `/predict` endpoints.
+- **Requirement**: Must load the `.pkl` model files into memory at startup.
 
-#### FR-04: Model Training Interface
-- **Description**: Scripts to retrain the model if dataset changes.
-- **Input**: `train_model.py` execution.
-- **Output**: updated `.pkl` files in `backend/models/`.
+#### FR-04: Cloud Deployment (Step Last)
+- **Description**: The application must be hosted publicly.
+- **Platform**: Render (Free Tier).
+- **Configuration**: Uses `render.yaml` to define the build environment.
+- **Build Step**: `pip install dependencies` AND `python train_model.py` (Server-side training).
 
 ### 3.2 Non-Functional Requirements
 
-#### NFR-01: Performance
-- Prediction time should be under 2 seconds for standard text input.
-- URL scraping limit set to 10 seconds timeout.
+#### NFR-01: Compatibility check
+- The system must resolve Python version mismatches (e.g., 3.13 local vs 3.11 server) by training on the target environment.
 
-#### NFR-02: Reliability
-- The system must handle failures gracefully (e.g., invalid URLs, empty inputs) with clear error messages.
-- Fallback mechanisms for API limitations (mock data).
+#### NFR-02: Performance
+- API Response time < 500ms.
+- Cold start time < 50 seconds (due to free tier constraints).
 
-#### NFR-03: Portability
-- The application should run on any system with Python installed (Windows/Linux/macOS).
-- The web interface should be compatible with modern browsers (Chrome, Edge, Firefox).
-
-#### NFR-04: Usability
-- Clean, intuitive UI/UX with clear indicators (Red for Fake, Green for Real).
-- Responsive design for mobile and desktop views.
+#### NFR-03: Maintainability
+- Code must be modular (`app.py` separate from `train_model.py`).
+- Automated deployment via GitHub push.
 
 ---
 
-## 4. System Interfaces
+## 4. System Architecture (Step 1 to Step Last)
 
-### 4.1 User Interface
-- **Home Page**: Main dashboard with tabs for "Text", "Topic", and "URL" analysis.
-- **Result Section**: Dynamic area updating via AJAX/Fetch API to show results without page reload.
+The project follows this sequential flow:
 
-### 4.2 Hardware Interfaces
-- No specific hardware required beyond a standard computer capable of running Python.
-
-### 4.3 Software Interfaces
-- **OS**: Windows, Linux, or macOS.
-- **Runtime**: Python 3.8+.
-- **Libraries**: Flask, Scikit-learn, Pandas, NLTK.
+1.  **Data Phase**: `fake_or_real_news.csv` -> Preprocessing -> TF-IDF -> Model Training.
+2.  **App Phase**: Flask App loads Model -> Serves HTML/JS Frontend.
+3.  **Git Phase**: Local Code -> `git push` -> GitHub Repository.
+4.  **Deploy Phase**: GitHub -> Render Webhook -> Build (Install + Train) -> Deploy.
 
 ---
 
 ## 5. Appendices
-- **Dataset**: Using standard "Fake News" datasets (e.g., from Kaggle) containing title, text, and label.
-- **Algorithm**: Logistic Regression with TF-IDF Vectorizer.
+- **LIBRARIES USED**: Flask, Scikit-learn, Pandas, NLTK, Gunicorn.
+- **HOSTING**: Render.com.
+- **VERSION CONTROL**: GitHub.
