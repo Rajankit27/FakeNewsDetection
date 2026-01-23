@@ -1,56 +1,74 @@
 # PROJECT SYNOPSIS
-## Fake News Detection System Using Machine Learning
+## Fake News Detection System
 
-**Student Name:** [Your Name]  
-**Course:** BCA (Final Year)  
+**Topic:** Fake News Detection Using Machine Learning  
 **Date:** 2026-01-23
 
 ---
 
 ### 1. Introduction
-In an era where information spreads instantly, the distinction between authentic news and fabricated stories has blurred. The **Fake News Detection System** is an AI-powered web application designed to automatically classify news articles as "REAL" or "FAKE". This project helps users verify the credibility of information using Natural Language Processing (NLP) techniques.
+The proliferation of fake news on social media and digital platforms has become a critical global issue, leading to misinformation and panic. This project, **Fake News Detection System**, is an AI-powered web application designed to automatically classify news articles as "REAL" or "FAKE". By utilizing Natural Language Processing (NLP) and Machine Learning (Logistic Regression), the system analyzes the linguistic patterns of text to determine its authenticity.
 
-### 2. Problem Statement
-The rapid spread of misinformation on social media can cause panic, damage reputations, and influence public opinion. Manual verification is slow and impractical for the volume of data users consume. There is a need for an automated, accessible tool that can instantly analyze and flag suspicious content.
+**System Flowchart:**
 
-### 3. Objectives
-1.  **Develop a ML Model:** To train a Logistic Regression model on a dataset of 6,000+ news articles.
-2.  **Create a Web Interface:** To build a user-friendly frontend where users can simply paste text or URLs.
-3.  **Automate Classification:** To provide immediate "Real" vs "Fake" predictions with a confidence score.
-4.  **End-to-End Deployment:** To host the application on the cloud (Render) to make it publicly accessible.
+```mermaid
+graph LR
+    User[User] -->|Input Text/URL| UI[Web Interface]
+    UI -->|Send Data| Server[Flask Backend]
+    Server -->|Preprocess| NLP[Tokenization & TF-IDF]
+    NLP -->|Vectorized Data| Model[ML Model]
+    Model -->|Prediction| Result[Real/Fake Score]
+    Result -->|Display| UI
+```
 
-### 4. Methodology (Step-by-Step)
+### 2. Objective
+The primary objectives of this project are:
+*   To develop an automated system capable of detecting fake news with high accuracy (>90%).
+*   To implement a user-friendly Web Interface for easy access by the general public.
+*   To utilize **Logistic Regression** and **TF-IDF** for efficient text classification.
+*   To provide a confidence score (probability) along with the prediction.
+*   To deploy the solution on a cloud platform (**Render**) for real-time global accessibility.
 
-#### Step 1: Data Collection & Preprocessing
--   **Dataset:** We utilize a labeled dataset containing text and "FAKE/REAL" labels.
--   **Preprocessing:** The raw text is cleaned (removing punctuation, lowercasing) and Tokenized.
--   **Vectorization:** We use **TF-IDF (Term Frequency-Inverse Document Frequency)** to convert text into numerical vectors that the machine can understand.
+### 3. Hardware and Software Requirements
 
-#### Step 2: Model Training
--   **Algorithm:** **Logistic Regression** is used for its efficiency in binary text classification.
--   **Training:** The model learns patterns (e.g., sensationalist words found in fake news) from the training data.
--   **Output:** The trained model is saved as a pickle file (`.pkl`) for reuse.
+**Software Requirements:**
+*   **Operating System:** Windows 10/11, Linux, or macOS.
+*   **Programming Language:** Python 3.11+.
+*   **Web Framework:** Flask.
+*   **Libraries:** Scikit-learn, Pandas, NLTK, Gunicorn.
+*   **Tools:** VS Code, Git, GitHub.
+*   **Cloud Platform:** Render (for deployment).
 
-#### Step 3: Web Application Development
--   **Backend:** **Flask (Python)** loads the saved model and exposes an API endpoint.
--   **Frontend:** **HTML/CSS/JavaScript** provides the user interface for Text Input, URL Scraping, and Topic Search.
+**Hardware Requirements:**
+*   **Processor:** Intel Core i3 or higher / AMD equivalent.
+*   **RAM:** Minimum 4GB (8GB recommended for training).
+*   **Storage:** 500MB free disk space.
+*   **Internet Connection:** Required for API access and deployment.
 
-#### Step 4: Testing & Validation
--   The system validates input length (min 10 chars).
--   It handles errors (e.g., invalid URLs) gracefully.
--   Accuracy is verified on unseen test data (achieving ~92%).
+### 4. Research Gap
+Existing solutions for fake news verification typically fall into two categories: manual fact-checking (which is slow and non-scalable) or complex academic models (which lack user interfaces).
+*   **The Gap:** There is a lack of lightweight, open-source tools that combine accurate ML classification with a simple, accessible UI for the common user.
+*   **Our Solution:** This project bridges that gap by wrapping a powerful ML model in an intuitive web app that anyone can use instantly without technical knowledge.
 
-#### Step 5 (Final): Cloud Deployment
--   **Platform:** The project is deployed on **Render.com**.
--   **CI/CD:** The code is pushed to **GitHub**, which triggers an automatic build on Render.
--   **Server-Side Training:** To ensure compatibility, the model is retrained automatically on the cloud server during deployment.
+### 5. Timeline
 
-### 5. Tools & Technologies Used
--   **Language:** Python 3.11
--   **Web Framework:** Flask
--   **Machine Learning:** Scikit-Learn, Pandas, NLTK
--   **Deployment:** Render (Cloud), Gunicorn (Server)
--   **Version Control:** Git & GitHub
+| Phase | Activity | Duration |
+| :--- | :--- | :--- |
+| **Phase 1** | Requirement Gathering & Data Collection | Week 1 |
+| **Phase 2** | Preprocessing & Model Training | Week 2 |
+| **Phase 3** | Backend (Flask) & Frontend Development | Week 3 |
+| **Phase 4** | Testing, Validation & UI Polish | Week 4 |
+| **Phase 5** | Cloud Deployment (Render) & Documentation | Week 5 |
 
-### 6. Conclusion
-The Fake News Detection System successfully bridges the gap between complex AI technology and everyday users. By following a structured development lifecycle from data analysis to cloud hosting, the project delivers a robust, real-time solution for combating misinformation.
+### 6. Advantages
+*   **Automated Verification:** Instant results without human intervention.
+*   **High Accuracy:** ~92% accuracy on the test dataset.
+*   **User-Friendly:** Simple "Paste & Check" interface.
+*   **Scalable:** Hosted on the cloud, accessible from any device.
+*   **Cost-Effective:** Built using open-source technologies (Python) and free tier hosting.
+
+### 7. Reference
+1.  *H. Allcott and M. Gentzkow*, "Social Media and Fake News in the 2016 Election," Journal of Economic Perspectives, 2017.
+2.  *Scikit-learn Documentation*: https://scikit-learn.org
+3.  *Flask Documentation*: https://flask.palletsprojects.com
+4.  *UCI Machine Learning Repository*: https://archive.ics.uci.edu/ml/datasets.php
