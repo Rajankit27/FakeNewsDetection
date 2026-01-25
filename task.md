@@ -5,4 +5,4 @@
 - [x] Update `requirements.txt` with production server (gunicorn) <!-- id: 2 -->
 - [x] Create/Update documentation for Render deployment steps <!-- id: 3 -->
 - [x] Push code to GitHub <!-- id: 4 -->
-- [/] Deploy on Render <!-- id: 5 -->
+- [x] Deploy on Render <!-- id: 5 -->
