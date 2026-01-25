@@ -6,6 +6,7 @@ python-dotenv
 nltk
 numpy
 scikit-learn
+pandas
 beautifulsoup4
 requests
 feedparser
