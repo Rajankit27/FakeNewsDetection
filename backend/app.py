@@ -17,8 +17,13 @@ import numpy as np
 import feedparser
 
 # --- Configuration ---
-app = Flask(__name__)
+# --- Configuration ---
+app = Flask(__name__, static_folder="../frontend", static_url_path="/")
 CORS(app) # Enable CORS for frontend
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 # JWT Setup
 app.config['JWT_SECRET_KEY'] = 'truthlens-secret-key-super-secure' 
