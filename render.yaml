@@ -4,6 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt && python -m nltk.downloader stopwords wordnet omw-1.4 && python ml/train_model.py"
+    # Render automatically injects the PORT environment variable, which Gunicorn binds to.
     startCommand: "gunicorn backend.app:app"
     envVars:
       - key: PYTHON_VERSION

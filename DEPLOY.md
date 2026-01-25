@@ -1,51 +1,37 @@
-# Deploying to Render.com
+# Deployment Guide (Render)
 
-This project is "Render-ready". Follow these steps to deploy it for free.
+## Overview
+This application is configured for deployment on [Render](https://render.com). It uses a Python Flask backend served by Gunicorn and a static frontend.
 
-## 1. Prerequisites
-- Push your code to a **GitHub** repository.
-- Sign up for a free account at [render.com](https://render.com).
+## Configuration Details
+- **Build Command**: `pip install -r requirements.txt && python -m nltk.downloader stopwords wordnet omw-1.4 && python ml/train_model.py`
+  - Installs dependencies.
+  - Downloads necessary NLTK data.
+  - Retrains the model during build to ensure it's fresh.
+- **Start Command**: `gunicorn backend.app:app`
+  - Uses Gunicorn (Green Unicorn) as the production WSGI server.
+  - **Why Gunicorn?**: It handles concurrency much better than Flask’s built-in development server, essential for a production environment.
+- **Port Binding**: Render automatically injects a `PORT` environment variable. Gunicorn automatically binds to this port, so no manual port configuration is required in the code.
 
-## 2. API & Keys
-**Important:** The project currently uses a **Mock API** for the "Global News" feature so it works without payment.
-- If you use the free **NewsAPI.org** key, it typically **only works on Localhost**.
-- On Render (Cloud), the free key often gets blocked or fails.
-- **Recommendation:** Stick to the Mock logic for the hosted demo.
+## Steps to Deploy
+1. **Push to GitHub**:
+   Ensure all changes, including `requirements.txt` and `render.yaml`, are committed and pushed.
+   ```bash
+   git add .
+   git commit -m "Prepare for deployment"
+   git push origin main
+   ```
 
-## 3. Create New Web Service on Render
-1.  Click **"New +"** -> **"Web Service"**.
-2.  Connect your GitHub repository.
-3.  Fill in the details:
-    - **Name:** `fake-news-detector` (or any name)
-    - **Region:** Any (e.g., Singapore, Frankfurt)
-    - **Branch:** `main` (or your working branch)
-    - **Runtime:** `Python 3`
+2. **Create Web Service on Render**:
+   - Go to Dashboard -> New -> Web Service.
+   - Connect your GitHub repository.
+   - Render should automatically detect `render.yaml`.
+   - Click **Deploy**.
 
-## 4. Configure Commands (CRITICAL)
+3. **Environment Variables**:
+   - Ensure `MONGO_URI` is set in the Render Dashboard (or `render.yaml` if not sensitive).
+   - Currently, `render.yaml` handles basic setup.
 
-**Build Command:**
-This installs dependencies AND downloads necessary NLTK data.
-```bash
-pip install -r requirements.txt && python -m nltk.downloader stopwords wordnet omw-1.4
-```
-
-**Start Command:**
-This uses Gunicorn (production server) to run your Flask app.
-```bash
-gunicorn backend.app:app
-```
-
-## 5. Environment Variables (Optional)
-If you decide to use a real API key later, add it here:
-- Key: `NEWS_API_KEY`
-- Value: `your_actual_key`
-
-## 6. Deploy
-- Click **"Create Web Service"**.
-- Wait for the build to finish (about 2-3 minutes).
-- Your URL will be `https://fake-news-detector-xxxx.onrender.com`.
-
-## Troubleshooting
-- **"Internal Server Error"**: Check the "Logs" tab. It often means a missing library or NLTK data passed.
-- **"Model not found"**: Ensure you have pushed the `backend/models/*.pkl` files to GitHub. If they are in `.gitignore`, you need to remove them from there or run the training script as part of the build (not recommended for free tier due to RAM usage).
-  - *Recommendation:* Push the `.pkl` files to GitHub for this project.
+## Verification
+- Once deployed, visit the provided `.onrender.com` URL.
+- Check the logs to ensure the server started successfully.

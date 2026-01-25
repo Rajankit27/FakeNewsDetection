@@ -1,7 +1,12 @@
 flask
-pandas
+flask-cors
+flask-jwt-extended
+pymongo
+python-dotenv
+nltk
+numpy
 scikit-learn
-gunicornltk
-requests
 beautifulsoup4
+requests
+feedparser
 gunicorn
