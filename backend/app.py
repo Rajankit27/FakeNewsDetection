@@ -4,8 +4,126 @@ import os
 import re
 import requests
 from bs4 import BeautifulSoup
+import sqlite3
+import datetime
+from urllib.parse import urlparse
+import logging
+from logging.handlers import RotatingFileHandler
+import time
+import numpy as np
 
 app = Flask(__name__, static_folder='static')
+
+# --- Logging Configuration ---
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+
+file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.INFO)
+
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
+app.logger.info('FakeNewsDetector startup')
+
+@app.before_request
+def before_request():
+    request.start_time = time.time()
+    app.logger.info(f"Request: {request.method} {request.path} from {request.remote_addr}")
+
+@app.after_request
+def after_request(response):
+    if hasattr(request, 'start_time'):
+        elapsed = time.time() - request.start_time
+        app.logger.info(f"Response: {response.status} | Duration: {elapsed:.3f}s")
+    return response
+
+# --- Database & History ---
+def init_db():
+    conn = sqlite3.connect('history.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS predictions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                  text TEXT, 
+                  prediction TEXT, 
+                  confidence REAL, 
+                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                  source_score INTEGER,
+                  source_domain TEXT)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+def log_prediction_to_db(text, prediction, confidence, source_score=None, source_domain=None):
+    try:
+        conn = sqlite3.connect('history.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO predictions (text, prediction, confidence, source_score, source_domain) VALUES (?, ?, ?, ?, ?)",
+                  (text[:200], prediction, confidence, source_score, source_domain))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        app.logger.error(f"DB Error: {e}")
+
+# --- Helper Functions (XAI & Credibility) ---
+
+def get_contributing_words(text, vectorizer, model, n=5):
+    """Extracts top words contributing to the prediction based on model coefficients."""
+    if not hasattr(model, 'coef_'):
+        return []
+    
+    try:
+        feature_names = np.array(vectorizer.get_feature_names_out())
+        coefs = model.coef_[0]
+        
+        # Preprocess input text to match features
+        processed_text = preprocess_text(text)
+        words = processed_text.split()
+        
+        # Find which words from input are in vocabulary
+        input_features = [word for word in words if word in vectorizer.vocabulary_]
+        unique_input_features = list(set(input_features))
+        
+        word_impacts = []
+        for word in unique_input_features:
+            idx = vectorizer.vocabulary_[word]
+            score = coefs[idx]
+            word_impacts.append({"word": word, "score": float(score)})
+        
+        # Sort by absolute impact
+        word_impacts.sort(key=lambda x: abs(x['score']), reverse=True)
+        return word_impacts[:n]
+    except Exception as e:
+        app.logger.error(f"XAI Error: {e}")
+        return []
+
+TRUSTED_DOMAINS = {'bbc.com', 'reuters.com', 'npr.org', 'pbs.org', 'apnews.com', 'who.int', 'gov'}
+SUSPICIOUS_DOMAINS = {'infowars.com', 'theonion.com', 'breitbart.com', 'naturalnews.com'}
+
+def check_domain_credibility(url):
+    try:
+        domain = urlparse(url).netloc.lower()
+        if domain.startswith('www.'):
+            domain = domain[4:]
+            
+        score = 50 # Neutral default
+        
+        if any(t in domain for t in TRUSTED_DOMAINS):
+            score = 90
+        elif any(s in domain for s in SUSPICIOUS_DOMAINS):
+            score = 20
+        
+        # Simple heuristics
+        if domain.endswith('.gov') or domain.endswith('.edu'):
+            score = 95
+            
+        return score, domain
+    except:
+        return 0, "unknown"
+
 
 # --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,11 +179,14 @@ def static_files(path):
 @app.route('/predict', methods=['POST'])
 def predict():
     if not model or not vectorizer:
+        app.logger.error("Model or vectorizer not loaded")
         return jsonify({"status": "error", "message": "Model not loaded"}), 500
 
     try:
         data = request.get_json()
         news_text = data.get('text', '').strip()
+        
+        app.logger.info(f"Prediction request received. Text length: {len(news_text)}")
 
         # Validation
         if not news_text:
@@ -76,25 +197,46 @@ def predict():
         # Prediction
         cleaned_text = preprocess_text(news_text)
         vectorized_text = vectorizer.transform([cleaned_text])
+        
+        # Check if text contains any known words
+        if vectorized_text.nnz == 0:
+            # No known words found in the text
+            return jsonify({
+                "status": "success",
+                "prediction": "REAL", # Default to REAL or Uncertain for empty vectors to avoid "High Risk" alarmism
+                "confidence": 50,
+                "note": "Input text contained no known vocabulary words."
+            })
+            
         prediction = model.predict(vectorized_text)[0]
         proba = model.predict_proba(vectorized_text)[0]
         confidence = max(proba) * 100
 
         result = "FAKE" if prediction == "FAKE" else "REAL"
+        
+        # XAI
+        xai_words = get_contributing_words(cleaned_text, vectorizer, model)
+        
+        # Logging
+        app.logger.info(f"Prediction: {result} ({confidence:.1f}%) | Words: {[w['word'] for w in xai_words]}")
+        log_prediction_to_db(news_text, result, confidence)
 
         return jsonify({
             "status": "success",
             "prediction": result,
-            "confidence": int(confidence)
+            "confidence": int(confidence),
+            "contributing_words": xai_words
         })
 
     except Exception as e:
+        app.logger.error(f"Prediction error: {str(e)}", exc_info=True)
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # --- Phase 2: Global News API Integration ---
 @app.route('/predict-from-api', methods=['POST'])
 def predict_from_api():
     if not model or not vectorizer:
+        app.logger.error("Model not loaded for API prediction")
         return jsonify({"status": "error", "message": "Model not loaded"}), 500
 
     try:
@@ -157,12 +299,14 @@ def predict_from_api():
         })
 
     except Exception as e:
+        app.logger.error(f"API Prediction error: {str(e)}", exc_info=True)
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # --- Phase 3: URL Verification ---
 @app.route('/predict-from-url', methods=['POST'])
 def predict_from_url():
     if not model or not vectorizer:
+        app.logger.error("Model not loaded for URL prediction")
         return jsonify({"status": "error", "message": "Model not loaded"}), 500
 
     try:
@@ -199,15 +343,50 @@ def predict_from_url():
         prediction = model.predict(vectorized_text)[0]
         proba = model.predict_proba(vectorized_text)[0]
         confidence = max(proba) * 100
+        
+        result = "FAKE" if prediction == "FAKE" else "REAL"
+        
+        # Credibility & XAI
+        source_score, domain = check_domain_credibility(url)
+        xai_words = get_contributing_words(cleaned_text, vectorizer, model)
+
+        app.logger.info(f"URL Predict: {result} | Domain: {domain} | Score: {source_score}")
+        log_prediction_to_db(full_text, result, confidence, source_score, domain)
 
         return jsonify({
             "status": "success",
-            "prediction": "FAKE" if prediction == "FAKE" else "REAL",
+            "prediction": result,
             "confidence": int(confidence),
-            "extracted_title": title[:100] + "..." if len(title) > 100 else title
+            "extracted_title": title[:100] + "..." if len(title) > 100 else title,
+            "source_score": source_score,
+            "contributing_words": xai_words
         })
 
     except Exception as e:
+        app.logger.error(f"URL Prediction error: {str(e)}", exc_info=True)
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/history')
+def get_history():
+    try:
+        conn = sqlite3.connect('history.db')
+        conn.row_factory = sqlite3.Row # Allow dict-like access
+        c = conn.cursor()
+        
+        # Get recent 10
+        c.execute("SELECT * FROM predictions ORDER BY timestamp DESC LIMIT 10")
+        rows = c.fetchall()
+        recent = [dict(row) for row in rows]
+        
+        # Get Stats
+        c.execute("SELECT prediction, COUNT(*) FROM predictions GROUP BY prediction")
+        stats_rows = c.fetchall()
+        stats = {row[0]: row[1] for row in stats_rows}
+        
+        conn.close()
+        return jsonify({"status": "success", "recent": recent, "stats": stats})
+    except Exception as e:
+        app.logger.error(f"History API Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':

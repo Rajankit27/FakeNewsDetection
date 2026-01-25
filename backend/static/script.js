@@ -4,23 +4,100 @@ let currentMode = 'text'; // 'text', 'api', 'url'
 function switchTab(mode) {
     currentMode = mode;
 
-    // Update Tab UI
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+    // 1. Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
 
-    // Activate selected
-    const index = mode === 'text' ? 0 : mode === 'api' ? 1 : 2;
-    document.querySelectorAll('.tab-btn')[index].classList.add('active');
-    document.getElementById(`tab-${mode}`).style.display = 'block';
+    // 2. Deactivate all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
 
-    // Reset Result
-    document.getElementById('result').style.display = 'none';
+    // 3. Show selected tab content
+    const selectedTab = document.getElementById(`tab-${mode}`);
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
 
-    // Update Button Text
+    // 4. Activate selected button
+    // Map mode to index: text=0, api=1, url=2, analytics=3
+    const indices = { 'text': 0, 'api': 1, 'url': 2, 'analytics': 3 };
+    const index = indices[mode];
+
+    if (index !== undefined) {
+        const buttons = document.querySelectorAll('.tab-btn');
+        if (buttons[index]) {
+            buttons[index].classList.add('active');
+        }
+    }
+
+    // 5. Toggle verify button visibility
+    // The button should be visible for input modes, hidden for analytics
     const btnText = document.getElementById('btnText');
-    if (mode === 'text') btnText.textContent = "Verify Authenticity";
-    else if (mode === 'api') btnText.textContent = "Search & Analyze";
-    else if (mode === 'url') btnText.textContent = "Scan URL";
+    const mainButton = document.getElementById('checkButton'); // Ensure we target the button element
+
+    // Determine main button text based on mode
+    if (mode === 'text') {
+        btnText.textContent = "Verify Authenticity";
+        mainButton.style.display = 'block'; // Show button
+        document.getElementById('result').style.display = 'none'; // Clear result when switching
+    }
+    else if (mode === 'api') {
+        btnText.textContent = "Search & Analyze";
+        mainButton.style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+    }
+    else if (mode === 'url') {
+        btnText.textContent = "Scan URL";
+        mainButton.style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+    }
+    else if (mode === 'analytics') {
+        mainButton.style.display = 'none'; // Hide button for analytics
+        loadAnalytics();
+    }
+}
+
+async function loadAnalytics() {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '<p style="text-align:center; color:#64748b;">Loading data...</p>';
+
+    try {
+        const res = await fetch('/api/history');
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            // Update Stats
+            document.getElementById('statTotal').textContent = Object.values(data.stats).reduce((a, b) => a + b, 0);
+
+            const total = Object.values(data.stats).reduce((a, b) => a + b, 0);
+            const fake = data.stats['FAKE'] || 0;
+            const pct = total > 0 ? Math.round((fake / total) * 100) : 0;
+            document.getElementById('statFakePct').textContent = `${pct}%`;
+
+            // Render List
+            if (data.recent.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#64748b;">No verification history yet.</p>';
+            } else {
+                list.innerHTML = data.recent.map(item => `
+                    <div class="history-item">
+                        <div style="flex:1; margin-right:1rem;">
+                            <div style="font-weight:600; margin-bottom:0.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${item.text.substring(0, 50)}...
+                            </div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">${new Date(item.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="history-label ${item.prediction}">
+                            ${item.prediction} (${Math.round(item.confidence)}%)
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        list.innerHTML = '<p style="text-align:center; color:#e71d36;">Failed to load analytics.</p>';
+    }
 }
 
 async function predictNews() {
@@ -81,7 +158,7 @@ async function predictNews() {
             if (currentMode === 'api') {
                 displayApiResults(data.results);
             } else {
-                displayResult(data.prediction, data.confidence, data.extracted_title);
+                displayResult(data.prediction, data.confidence, data.extracted_title, data.contributing_words, data.source_score);
             }
         } else {
             alert("Error: " + data.message);
@@ -109,7 +186,13 @@ function displayApiResults(results) {
     results.forEach(item => {
         const isFake = item.prediction === 'FAKE';
         const color = isFake ? '#ef4444' : '#10b981';
-        const badge = isFake ? 'Suspect' : 'Reliable';
+        // Dynamic Badge Logic
+        let badge = 'Unknown';
+        if (isFake) {
+            badge = item.confidence > 80 ? 'High Risk' : 'Suspect';
+        } else {
+            badge = item.confidence > 80 ? 'Verified' : 'Likely Real';
+        }
 
         resultDiv.innerHTML += `
             <div style="margin-top: 1rem; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; border-left: 4px solid ${color}; background: #fff;">
@@ -130,7 +213,7 @@ function displayApiResults(results) {
     });
 }
 
-function displayResult(prediction, confidence, title = null) {
+function displayResult(prediction, confidence, title = null, xaiWords = [], sourceScore = null) {
     const resultDiv = document.getElementById('result');
     // Reset innerHTML if coming from API view
     if (!document.getElementById('predictionBadge')) {
@@ -146,8 +229,14 @@ function displayResult(prediction, confidence, title = null) {
             </div>
 
             <div class="reason-box">
-                <span class="reason-label">Reason:</span>
+                <span class="reason-label">Analysis:</span>
                 <span id="predictionReason"></span>
+                <div id="xaiContainer" class="xai-container"></div>
+            </div>
+
+            <div id="sourceScoreContainer" style="display:none; margin-top: 10px;">
+                <span class="reason-label">Source Credibility:</span>
+                <span id="sourceScoreBadge" class="badge-small"></span>
             </div>
 
             <div class="confidence-section">
@@ -184,7 +273,14 @@ function displayResult(prediction, confidence, title = null) {
     resultDiv.classList.add(isFake ? 'is-fake' : 'is-real');
 
     // 2. Set Badge & Title
-    badge.textContent = isFake ? "Suspicious Content" : "Verified Source";
+    let badgeText = "Unknown";
+    if (isFake) {
+        badgeText = confidence > 80 ? "High Risk" : "Suspicious Content";
+    } else {
+        badgeText = confidence > 80 ? "Verified Source" : "Likely Real";
+    }
+    badge.textContent = badgeText;
+
     resultTitle.textContent = isFake ? "⚠ Likely Fake News" : "✅ Likely Real News";
 
     // 3. Generate "Explainable" Reason
@@ -194,6 +290,34 @@ function displayResult(prediction, confidence, title = null) {
     // Round to 1 decimal place
     const confPercent = Math.round(confidence * 10) / 10;
     confidenceValue.textContent = `${confPercent}%`;
+
+    // 5. XAI Words
+    const xaiDiv = document.getElementById('xaiContainer');
+    if (xaiWords && xaiWords.length > 0) {
+        xaiDiv.innerHTML = xaiWords.map(w => `<span class="word-chip">${w.word} (${w.score.toFixed(2)})</span>`).join('');
+        xaiDiv.style.display = 'flex';
+    } else {
+        xaiDiv.style.display = 'none';
+    }
+
+    // 6. Source Score
+    const scoreDiv = document.getElementById('sourceScoreContainer');
+    const scoreBadge = document.getElementById('sourceScoreBadge');
+
+    if (sourceScore !== null && sourceScore !== undefined) {
+        scoreDiv.style.display = 'block';
+        let cls = 'neutral';
+        let txt = 'Unknown';
+
+        if (sourceScore >= 80) { cls = 'trusted'; txt = `High Trust (${sourceScore}/100)`; }
+        else if (sourceScore <= 30) { cls = 'suspicious'; txt = `Low Trust (${sourceScore}/100)`; }
+        else { txt = `Neutral (${sourceScore}/100)`; }
+
+        scoreBadge.className = `badge-small ${cls}`;
+        scoreBadge.textContent = txt;
+    } else {
+        scoreDiv.style.display = 'none';
+    }
 
     // Animate Progress Bar (start from 0)
     confidenceBar.style.width = '0%';

@@ -22,6 +22,7 @@
                 <button class="tab-btn active" onclick="switchTab('text')">Text Check</button>
                 <button class="tab-btn" onclick="switchTab('api')">Global News (API)</button>
                 <button class="tab-btn" onclick="switchTab('url')">Verify URL</button>
+                <button class="tab-btn" onclick="switchTab('analytics')">Analytics</button>
             </div>
 
             <!-- Tab Content: Text Check -->
@@ -50,6 +51,25 @@
                 </div>
             </div>
 
+            <!-- Tab Content: Analytics -->
+            <div id="tab-analytics" class="tab-content" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Checks</h3>
+                        <p id="statTotal">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Fake %</h3>
+                        <p id="statFakePct">0%</p>
+                    </div>
+                </div>
+                <h3>Recent Activity</h3>
+                <div class="history-list" id="historyList">
+                    <!-- Loaded via JS -->
+                    <p>Loading history...</p>
+                </div>
+            </div>
+
             <button id="checkButton" onclick="predictNews()">
                 <span id="btnText">Verify Authenticity</span>
             </button>
@@ -67,8 +87,14 @@
                 <h2 id="predictionResult" class="result-title"></h2>
 
                 <div class="reason-box">
-                    <span class="reason-label">Reason:</span>
+                    <span class="reason-label">Analysis:</span>
                     <span id="predictionReason"></span>
+                    <div id="xaiContainer" class="xai-container"></div>
+                </div>
+
+                <div id="sourceScoreContainer" style="display:none; margin-top: 10px;">
+                    <span class="reason-label">Source Credibility:</span>
+                    <span id="sourceScoreBadge" class="badge-small"></span>
                 </div>
 
                 <div class="confidence-section">
