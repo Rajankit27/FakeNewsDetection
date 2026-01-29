@@ -1,71 +1,63 @@
-# System Architecture Diagram
+# TruthLens AI: System Architecture & Workflow
 
-```mermaid
-graph TD
-    %% Nodes
-    subgraph "Client Layer"
-        User([User Browser])
-        Admin([Admin Browser])
-    end
+## 1. System Architecture Diagram
 
-    subgraph "Cloud Platform (Render)"
-        LB[Load Balancer / SSL Termination]
-        
-        subgraph "Application Container"
-            Gunicorn[Gunicorn WSGI Server]
-            Flask[Flask Backend API]
-            
-            subgraph "ML Inference Engine"
-                cleaner[NLTK Preprocessor]
-                tfidf[TF-IDF Vectorizer]
-                model[Logistic Regression Model]
-            end
-        end
-    end
+![System Architecture](truthlens_flowchart_final.png)
 
-    subgraph "Data Layer (MongoDB Atlas)"
-        Users[(User Store)]
-        Logs[(Intelligence Logs)]
-        Feedback[(Dispute Queue)]
-    end
+> [!TIP]
+> For a detailed, step-by-step breakdown of the data processing pipeline, see the [Data Flow Diagram](DATA_FLOW.md).
 
-    subgraph "External Ecosystem"
-        GitHub[GitHub Repo]
-        NewsAPI[External News APIs]
-        Web[Target Websites]
-    end
+## 2. Architecture Overview
 
-    %% Flows
-    User -->|HTTPS / REST| LB
-    Admin -->|HTTPS / REST| LB
-    LB --> Gunicorn
-    Gunicorn --> Flask
+TruthLens AI operates on a modern, monolithic architecture designed for speed and simplicity. It consists of four primary layers:
 
-    %% Backend Logic
-    Flask <-->|Auth / Profile| Users
-    Flask -->|Store Analysis| Logs
-    Flask -->|Record Disputes| Feedback
-    
-    %% ML Flow
-    Flask -- "Raw Text" --> cleaner
-    cleaner --> tfidf
-    tfidf --> model
-    model -- "Prediction & Confidence" --> Flask
+### A. The User Layer (Client)
+*   **User Interface (UI):** A responsive web dashboard featuring a "Bento Grid" layout. It handles user inputs (text/URL) and displays results with visual indicators (colors, icons).
+*   **Data Transport:** Communication happens via **JSON** over HTTPS.
 
-    %% External
-    Flask -- "Fetch Trends" --> NewsAPI
-    Flask -- "Scrape Content" --> Web
-    GitHub -- "Auto-Deploy Event" --> LB
+### B. The Application Layer (Backend Brain)
+*   **Flask Framework:** The central controller. It receives requests, validates authentication (JWT), and routes data to the correct processing engine.
+*   **Logic Components:**
+    *   **Web Scraper:** An automated module that can visit a URL, strip out ads/menus, and extract the core article text.
+    *   **ML Engine:** The core intelligence that uses a trained Logistic Regression model to classify text.
+    *   **Explainer (XAI):** A specialized module that "reverse engineers" the model's decision to find which specific words (e.g., "shocking", "breaking") contributed most to the score.
 
-    %% Styling
-    classDef client fill:#e0f2fe,stroke:#0284c7,stroke-width:2px;
-    classDef cloud fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px,stroke-dasharray: 5 5;
-    classDef app fill:#eff6ff,stroke:#3b82f6,stroke-width:2px;
-    classDef db fill:#f0fdf4,stroke:#22c55e,stroke-width:2px;
-    classDef ext fill:#f8fafc,stroke:#64748b,stroke-width:2px;
+### C. The Data Layer
+*   **MongoDB Atlas:** A cloud-based NoSQL database that stores:
+    *   **User Profiles:** Login credentials and secure tokens.
+    *   **Analysis Logs:** A history of every scan performed, allowing users to review past results.
 
-    class User,Admin client;
-    class LB,Gunicorn,Flask,cleaner,tfidf,model app;
-    class Users,Logs,Feedback db;
-    class GitHub,NewsAPI,Web ext;
-```
+---
+
+## 3. How It Works (Workflow Step-by-Step)
+
+This corresponds to the vertical flow in the diagram above:
+
+### Step 1: User Input
+The user authenticates and enters data into the dashboard. This can be:
+*   **Raw Text:** Copied from social media or WhatsApp.
+*   **URLs:** Links to news articles.
+
+### Step 2: Data Packaging
+The frontend packages this input into a structured **JSON** format and sends a secure POST request to the Flask server.
+
+### Step 3: Central Processing (Flask)
+The Flask server acts as the "Brain". It decides the path:
+*   **If URL:** It activates the **Web Scraper** to fetch the content first.
+*   **If Text:** It passes the content directly to the internal engines.
+
+### Step 4: Parallel Intelligence
+The system runs three operations efficiently:
+1.  **Vectorization:** Converts the text into mathematical numbers (TF-IDF).
+2.  **Prediction:** The **ML Engine** calculates a probability score (e.g., 0.92 for Fake).
+3.  **Explanation:** The **XAI Explainer** scans the text to identify high-impact keywords.
+
+### Step 5: Response Logic
+A centralized logic handler consolidates all data:
+*   Combines the **Prediction** (Fake/Real).
+*   Combines the **Confidence Score** (92%).
+*   Combines the **Reasoning** (List of suspicious words).
+*   *Simultaneously saves this record to MongoDB for history.*
+
+### Step 6: Final Output
+The server sends a detailed response back to the user. The Dashboard updates instantly to show the "FAKE" or "REAL" badge along with the confidence bar and explaining keywords.

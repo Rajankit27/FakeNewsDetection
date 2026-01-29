@@ -29,8 +29,8 @@ This application is configured for deployment on [Render](https://render.com). I
    - Click **Deploy**.
 
 3. **Environment Variables**:
-   - Ensure `MONGO_URI` is set in the Render Dashboard (or `render.yaml` if not sensitive).
-   - Currently, `render.yaml` handles basic setup.
+   - **Important**: Render will detect `MONGO_URI` and `JWT_SECRET_KEY` from `render.yaml`.
+   - **Action Required**: You must set the actual values for `MONGO_URI` in the Render Dashboard (Environment Variables section) if you want to use a different database than the default. `JWT_SECRET_KEY` will be auto-generated.
 
 ## Verification
 - Once deployed, visit the provided `.onrender.com` URL.

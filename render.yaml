@@ -11,3 +11,7 @@ services:
         value: 3.11.0
       - key: NEWS_API_KEY
         value: "mock_mode_active"
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true

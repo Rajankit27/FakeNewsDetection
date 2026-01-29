@@ -52,12 +52,17 @@ function initAuth() {
 
             if (res.ok) {
                 if (isRegister) {
-                    msg.textContent = "Registration successful. Please login.";
-                    msg.classList.remove('hidden', 'text-red-400');
-                    msg.classList.add('text-green-400');
+                    msg.innerHTML = '<i data-lucide="check-circle" class="w-3 h-3"></i> <span>Registration successful. Please login.</span>';
+
+                    // Reset classes
+                    msg.className = 'text-xs mt-4 text-center font-medium py-2 rounded-lg border flex items-center justify-center gap-2';
+                    // Add Success classes
+                    msg.classList.add('text-green-400', 'bg-green-500/10', 'border-green-500/20');
+
                     // Toggle back to login
                     isRegister = false;
                     toggle.click();
+                    if (window.lucide) lucide.createIcons();
                 } else {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('role', data.role);
@@ -68,9 +73,14 @@ function initAuth() {
                 throw new Error(data.msg);
             }
         } catch (err) {
-            msg.textContent = err.message;
-            msg.classList.remove('hidden', 'text-green-400');
-            msg.classList.add('text-red-400');
+            msg.innerHTML = `<i data-lucide="alert-circle" class="w-3 h-3"></i> <span>${err.message}</span>`;
+
+            // Reset classes
+            msg.className = 'text-xs mt-4 text-center font-medium py-2 rounded-lg border flex items-center justify-center gap-2';
+            // Add Error classes
+            msg.classList.add('text-red-400', 'bg-red-500/10', 'border-red-500/20');
+
+            if (window.lucide) lucide.createIcons();
         }
     });
 }
@@ -87,7 +97,6 @@ function initDashboard() {
     loadHistory();
 
     // Load History
-    loadHistory();
     // Load News Ticker
     initNewsTicker();
 }

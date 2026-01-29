@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Diagram Render</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            er: {
+                useMaxWidth: false,
+                diagramPadding: 20,
+                layoutDirection: 'TB',
+                minEntityWidth: 100,
+                entityPadding: 15
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .mermaid {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mermaid">
+        erDiagram
+        User {
+        int user_id PK
+        string name
+        string email
+        string role
+        datetime created_at
+        }
+        News {
+        int news_id PK
+        string input_type
+        text content
+        string source_url
+        datetime submitted_at
+        int user_id FK
+        }
+        Analysis_Result {
+        int result_id PK
+        string prediction
+        float confidence_score
+        string key_terms
+        datetime analyzed_at
+        int news_id FK
+        }
+        Feedback {
+        int feedback_id PK
+        text user_comment
+        boolean dispute_flag
+        datetime created_at
+        int user_id FK
+        int news_id FK
+        }
+        Logs {
+        int log_id PK
+        string action_type
+        datetime timestamp
+        int user_id FK
+        int news_id FK
+        }
+
+        User ||--o{ News : "submits (1:N)"
+        News ||--|| Analysis_Result : "has (1:1)"
+        User ||--o{ Feedback : "provides (1:N)"
+        News ||--o{ Feedback : "has (1:N)"
+        User ||--o{ Logs : "generates (1:N)"
+        News ||--o{ Logs : "related_to (1:N)"
+    </div>
+</body>
+
+</html>

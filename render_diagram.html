@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Flow Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                edgeLabelBackground: '#ffffff',
+                tertiaryColor: '#f4f4f4',
+                mainBkg: '#e1f5fe',
+                nodeBorder: '#0277bd'
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mermaid">
+        graph TD
+        %% Nodes
+        User([User])
+        Frontend[Frontend Dashboard]
+        API[Flask API]
+        Auth{Authenticated?}
+        Router{Input Type?}
+
+        subgraph "Data Processing / Transformation"
+        Clean[Preprocessing Engine<br />(Regex, Lemmatization)]
+        Vector[Vectorization<br />(TF-IDF)]
+        end
+
+        subgraph "Intelligence Core"
+        Model[ML Model<br />(Logistic Regression)]
+        XAI[XAI Explainer<br />(Feature Weight Analysis)]
+        end
+
+        subgraph "External Sources"
+        Scraper[Web Scraper]
+        RSS[News Feed API]
+        end
+
+        subgraph "Data Storage"
+        DB[(MongoDB Atlas)]
+        end
+
+        %% Flows
+        User -->|Enters Text/URL| Frontend
+        Frontend -->|JSON Request| API
+
+        API -->|Verify Token| Auth
+        Auth -- No --> Err[Return 401]
+        Auth -- Yes --> Router
+
+        %% Paths
+        Router -- "Text Input" --> Clean
+        Router -- "URL Input" --> Scraper
+        Router -- "Live Feed" --> RSS
+
+        Scraper -->|Extracted Text| Clean
+        RSS -->|News Titles| Clean
+
+        Clean -->|Cleaned Tokens| Vector
+        Vector -->|Feature Vector| Model
+
+        Model -->|Prediction & Probabilities| Logic[Logic Controller]
+        Vector -->|Vector Data| XAI
+        XAI -->|Contributing Words| Logic
+
+        Logic -->|Log Results| DB
+        Logic -->|JSON Response| Frontend
+        Frontend -->|Display Results| User
+
+        %% Styling
+        style User fill:#bbdefb,stroke:#0d47a1,stroke-width:2px
+        style Frontend fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+        style API fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+        style DB fill:#e1bee7,stroke:#7b1fa2,stroke-width:2px,stroke-dasharray: 5 5
+        style Model fill:#ffecb3,stroke:#ff6f00,stroke-width:2px
+        style XAI fill:#ffecb3,stroke:#ff6f00,stroke-width:2px
+    </div>
+</body>
+
+</html>

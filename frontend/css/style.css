@@ -15,7 +15,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-primary);
-    overflow: hidden;
+    /* overflow: hidden; Removed to allow scrolling if needed */
     /* App-like feel */
     font-size: 16px;
     /* Base font size increase from default ~14px of Tailwind */
@@ -73,7 +73,8 @@ body {
 /* Grid Layouts */
 .bento-grid {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
+    display: grid;
+    /* grid-template-columns: repeat(12, 1fr);  -- Moved to Tailwind classes for responsiveness */
     gap: 1.5rem;
     padding: 1.5rem;
     /* height: 100vh; - Removed to allow flex container control */

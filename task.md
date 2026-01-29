@@ -6,3 +6,5 @@
 - [x] Create/Update documentation for Render deployment steps <!-- id: 3 -->
 - [x] Push code to GitHub <!-- id: 4 -->
 - [x] Deploy on Render <!-- id: 5 -->
+- [x] Update SRS with complete system details
+- [x] Update SYNOPSIS.md to match final system

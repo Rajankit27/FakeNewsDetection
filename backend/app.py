@@ -26,11 +26,11 @@ def index():
     return app.send_static_file('index.html')
 
 # JWT Setup
-app.config['JWT_SECRET_KEY'] = 'truthlens-secret-key-super-secure' 
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'truthlens-secret-key-super-secure') 
 jwt = JWTManager(app)
 
 # MongoDB Setup
-MONGO_URI = "mongodb+srv://db:db123@cluster0.t2menvi.mongodb.net/?retryWrites=true&w=majority"
+MONGO_URI = os.getenv('MONGO_URI', "mongodb+srv://db:db123@cluster0.t2menvi.mongodb.net/?retryWrites=true&w=majority")
 try:
     client = MongoClient(MONGO_URI)
     db = client['truthlens_db']
