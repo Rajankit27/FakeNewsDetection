@@ -326,6 +326,15 @@ def predict_from_url():
         cleaned = preprocess_text(full_text)
         vec = vectorizer.transform([cleaned])
         
+        if vec.nnz == 0:
+            pred = "REAL"
+            conf = 50.0
+            note = "Low data / Verified"
+        else:
+            pred = "FAKE" if model.predict(vec)[0] == "FAKE" else "REAL"
+            conf = float(max(model.predict_proba(vec)[0]) * 100)
+            note = "Model Analysis"
+
         # Trust/Risk Logic for URL
         if pred == 'REAL':
             if conf > 90:
