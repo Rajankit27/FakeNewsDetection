@@ -70,6 +70,10 @@ function initAuth() {
                     window.location.href = data.role === 'admin' ? 'admin.html' : 'dashboard.html';
                 }
             } else {
+                if (res.status === 401 || res.status === 422) {
+                    logout(); // Auto logout on auth fail
+                    return;
+                }
                 throw new Error(data.msg);
             }
         } catch (err) {
@@ -213,7 +217,10 @@ async function analyze() {
             body: JSON.stringify(payload)
         });
 
-        if (res.status === 401) logout();
+        if (res.status === 401 || res.status === 422) {
+            logout();
+            return;
+        }
 
         const data = await res.json();
 
@@ -303,7 +310,12 @@ async function analyze() {
         }
 
     } catch (e) {
-        alert("System Error: " + e.message);
+        const msg = e.message.toLowerCase();
+        if (msg.includes("signature verification failed") || msg.includes("token has expired")) {
+            logout();
+        } else {
+            alert("System Error: " + e.message);
+        }
     } finally {
         btn.disabled = false;
         spinner.classList.add('hidden');
@@ -397,6 +409,12 @@ async function loadHistory() {
     const res = await fetch(`${API_BASE}/api/user/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (res.status === 401 || res.status === 422) {
+        logout();
+        return;
+    }
+
     const logs = await res.json();
 
     document.getElementById('totalScans').textContent = logs.length;
@@ -425,6 +443,11 @@ async function loadAdminStats() {
     const res = await fetch(`${API_BASE}/api/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (res.status === 401 || res.status === 422) {
+        logout();
+        return;
+    }
     const stats = await res.json();
 
     document.getElementById('adminTotal').textContent = stats.total_scans;
@@ -436,6 +459,11 @@ async function loadDisputes() {
     const res = await fetch(`${API_BASE}/api/admin/disputes`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (res.status === 401 || res.status === 422) {
+        logout();
+        return;
+    }
     const disputes = await res.json();
 
     document.getElementById('disputeCount').textContent = disputes.length;
@@ -465,6 +493,11 @@ async function initNewsTicker() {
         const res = await fetch(`${API_BASE}/api/live-news`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (res.status === 401 || res.status === 422) {
+            logout();
+            return;
+        }
         const articles = await res.json();
 
         const wrapper = document.getElementById('newsTicker');
