@@ -10,23 +10,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-gray-950 text-white font-inter min-h-screen">
+<body class="text-white min-h-screen">
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 glass-card border-r border-white/5 flex flex-col">
+        <aside class="w-64 glass-panel border-r border-white/5 flex flex-col z-20">
             <div class="p-6">
-                <h1 class="text-xl font-bold tracking-tight text-blue-400">Admin Console</h1>
-                <p class="text-xs text-gray-500">System Oversight Level 1</p>
+                <h1
+                    class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">
+                    Admin Console</h1>
+                <p class="text-xs text-slate-500 font-mono mt-1">System Oversight</p>
             </div>
             <nav class="flex-grow px-4 space-y-2 mt-4">
                 <a href="#"
-                    class="block px-4 py-3 bg-blue-600/10 text-blue-400 rounded-lg text-sm font-medium border border-blue-500/20">Overview</a>
+                    class="block px-4 py-3 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm font-medium border border-cyan-500/20">Overview</a>
                 <a href="#"
-                    class="block px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">Model
+                    class="block px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">Model
                     Retraining</a>
                 <a href="#"
-                    class="block px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">User
+                    class="block px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">User
                     Management</a>
             </nav>
             <div class="p-4 border-t border-white/10">
@@ -37,44 +39,52 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-8">
-            <h2 class="text-2xl font-bold mb-6">System Telemetry</h2>
-
-            <!-- Stats Row -->
-            <div class="grid grid-cols-3 gap-6 mb-8">
-                <div class="glass-card p-6 rounded-xl border border-white/5">
-                    <p class="text-sm text-gray-500 uppercase">Total API Calls</p>
-                    <p id="adminTotal" class="text-3xl font-bold mt-2">Loading...</p>
-                </div>
-                <div class="glass-card p-6 rounded-xl border border-white/5">
-                    <p class="text-sm text-gray-500 uppercase">Fake News Rate</p>
-                    <p id="adminFakeRate" class="text-3xl font-bold mt-2 text-red-400">Loading...</p>
-                </div>
-                <div class="glass-card p-6 rounded-xl border border-white/5">
-                    <p class="text-sm text-gray-500 uppercase">Active Agents</p>
-                    <p id="adminUsers" class="text-3xl font-bold mt-2 text-blue-400">Loading...</p>
-                </div>
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 z-0 opacity-10 pointer-events-none"
+                style="background-image: radial-gradient(var(--accent-cyan) 1px, transparent 1px); background-size: 24px 24px;">
             </div>
 
-            <!-- Dispute Table -->
-            <h2 class="text-xl font-bold mb-4 flex items-center">
-                Dispute Queue
-                <span id="disputeCount" class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">0</span>
-            </h2>
-            <div class="glass-card rounded-xl border border-white/5 overflow-hidden">
-                <table class="w-full text-left text-sm text-gray-400">
-                    <thead class="bg-white/5 text-gray-200 uppercase text-xs">
-                        <tr>
-                            <th class="px-6 py-4">Original Text</th>
-                            <th class="px-6 py-4">System Pred</th>
-                            <th class="px-6 py-4">User Claim</th>
-                            <th class="px-6 py-4">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="disputeTableBody" class="divide-y divide-white/5">
-                        <!-- Rows -->
-                    </tbody>
-                </table>
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold mb-6 text-white">System Telemetry</h2>
+
+                <!-- Stats Row -->
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Total API Calls</p>
+                        <p id="adminTotal" class="text-3xl font-bold mt-2 font-mono">Loading...</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Fake News Rate</p>
+                        <p id="adminFakeRate" class="text-3xl font-bold mt-2 text-red-400 font-mono">Loading...</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl">
+                        <p class="text-xs text-slate-400 uppercase font-bold">Active Agents</p>
+                        <p id="adminUsers" class="text-3xl font-bold mt-2 text-cyan-400 font-mono">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Dispute Table -->
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    Dispute Queue
+                    <span id="disputeCount"
+                        class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-mono">0</span>
+                </h2>
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm text-slate-400">
+                        <thead class="bg-white/5 text-slate-200 uppercase text-xs font-bold">
+                            <tr>
+                                <th class="px-6 py-4">Original Text</th>
+                                <th class="px-6 py-4">System Pred</th>
+                                <th class="px-6 py-4">User Claim</th>
+                                <th class="px-6 py-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disputeTableBody" class="divide-y divide-white/5">
+                            <!-- Rows -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>

@@ -100,9 +100,97 @@ function initDashboard() {
     // Load History
     loadHistory();
 
-    // Load History
     // Load News Ticker
     initNewsTicker();
+
+    // Init Charts
+    initCharts();
+
+    // Init Search
+    initSearch();
+}
+
+let scanChartInstance = null;
+let confChartInstance = null;
+
+function initCharts() {
+    // 1. Total Scans Chart (Sparkline)
+    const ctxScan = document.getElementById('scanChart').getContext('2d');
+
+    // Mock Data for sparkle
+    const dataPoints = [12, 19, 15, 25, 22, 30, 28, 35, 40, 45, 42, 50];
+
+    scanChartInstance = new Chart(ctxScan, {
+        type: 'line',
+        data: {
+            labels: dataPoints.map((_, i) => i),
+            datasets: [{
+                data: dataPoints,
+                borderColor: '#00d4ff',
+                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+
+    // 2. Confidence Meter (Doughnut)
+    const ctxConf = document.getElementById('confidenceChart').getContext('2d');
+    confChartInstance = new Chart(ctxConf, {
+        type: 'doughnut',
+        data: {
+            labels: ['Confidence', 'Remaining'],
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['#00d4ff', 'rgba(255, 255, 255, 0.1)'],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+        }
+    });
+}
+
+function updateConfChart(value, isReal) {
+    if (confChartInstance) {
+        confChartInstance.data.datasets[0].data = [value, 100 - value];
+        confChartInstance.data.datasets[0].backgroundColor = [
+            isReal ? '#00d4ff' : '#ff3366',
+            'rgba(255, 255, 255, 0.1)'
+        ];
+        confChartInstance.update();
+    }
+}
+
+function initSearch() {
+    const searchInput = document.getElementById('feedSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('#historyList > div');
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        });
+    }
 }
 
 function initAdmin() {
@@ -256,7 +344,10 @@ async function analyze() {
             // Confidence
             const conf = Math.round(data.confidence);
             document.getElementById('confScore').textContent = `${conf}%`;
-            document.getElementById('confScore').className = `text-3xl font-bold ${isReal ? 'text-teal-400' : 'text-red-400'}`;
+            document.getElementById('confScore').className = `text-3xl font-bold ${isReal ? 'text-teal-400' : 'text-red-400'} mr-3`;
+
+            // Update Chart
+            updateConfChart(conf, isReal);
 
             // AI Reasoning Section
             const dynamicContent = document.getElementById('dynamicContent');
@@ -421,15 +512,31 @@ async function loadHistory() {
 
     list.innerHTML = logs.map(log => {
         const isReal = log.prediction_result === 'REAL';
+        // Contextual Icon Logic
+        let icon = "📰";
+        const txt = log.text_content.toLowerCase();
+        if (txt.includes("india") || txt.includes("delhi")) icon = "🇮🇳";
+        else if (txt.includes("tech") || txt.includes("google")) icon = "💻";
+        else if (txt.includes("law") || txt.includes("court")) icon = "⚖️";
+        else if (txt.includes("money") || txt.includes("economy")) icon = "💰";
+
         return `
-        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition group cursor-pointer">
-            <div class="truncate flex-1 mr-3">
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-[10px] text-slate-500 font-mono">${new Date(log.timestamp).toLocaleTimeString()}</span>
-                    <span class="text-[10px] px-1.5 rounded ${isReal ? 'bg-teal-500/10 text-teal-400' : 'bg-red-500/10 text-red-400'}">${log.prediction_result}</span>
+        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition group cursor-pointer relative overflow-hidden">
+             <!-- ID Badge background -->
+             <div class="absolute left-0 top-0 bottom-0 w-1 ${isReal ? 'bg-teal-500' : 'bg-red-500'}"></div>
+             
+             <div class="flex items-center space-x-3 w-full pl-2">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-lg shadow-sm border border-white/10">
+                    ${icon}
                 </div>
-                <p class="text-xs text-slate-300 truncate group-hover:text-white transition">${log.text_content}</p>
-            </div>
+                <div class="truncate flex-1 mr-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] text-slate-500 font-mono">${new Date(log.timestamp).toLocaleTimeString()}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${isReal ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${log.prediction_result}</span>
+                    </div>
+                    <p class="text-xs text-slate-300 truncate group-hover:text-white transition font-medium">${log.text_content}</p>
+                </div>
+             </div>
         </div>`;
     }).join('');
 }

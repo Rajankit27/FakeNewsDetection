@@ -1,67 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --bg-dark: #0f172a;
-    --glass-panel: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --accent-blue: #3b82f6;
-    --accent-teal: #14b8a6;
-    --accent-red: #ef4444;
-    --text-primary: #f1f5f9;
+    --bg-dark: #0a0e17;
+    --glass-panel: rgba(18, 24, 43, 0.75);
+    --glass-border: rgba(0, 212, 255, 0.15);
+    /* ... existing vars ... */
+    --font-main: 'Manrope', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --accent-cyan: #00d4ff;
+    --accent-purple: #7c3aed;
+    --accent-red: #ff3366;
+    --text-primary: #ffffff;
     --text-secondary: #94a3b8;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-main);
+    background: radial-gradient(circle at 50% 0%, #1a233a 0%, var(--bg-dark) 100%);
     background-color: var(--bg-dark);
     color: var(--text-primary);
-    /* overflow: hidden; Removed to allow scrolling if needed */
-    /* App-like feel */
     font-size: 16px;
-    /* Base font size increase from default ~14px of Tailwind */
+    min-height: 100vh;
 }
 
-/* Swiper Overrides for Visibility */
+/* Swiper */
 .swiper-slide {
-    font-size: 1.1rem;
-    /* Larger text for ticker */
+    font-size: 1.0rem;
+    font-family: var(--font-main);
 }
 
 .swiper-slide .font-mono {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    font-family: var(--font-mono);
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism */
 .glass-panel {
     background: var(--glass-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.glass-header {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--glass-border);
+.glass-panel:hover {
+    box-shadow: 0 12px 40px 0 rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Sidebar */
 .sidebar-link {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 0.8rem 1.2rem;
     color: var(--text-secondary);
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    font-size: 0.875rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
     font-weight: 500;
+    margin-bottom: 0.5rem;
 }
 
-.sidebar-link:hover,
+.sidebar-link:hover {
+    background: rgba(0, 212, 255, 0.05);
+    color: var(--text-primary);
+    transform: translateX(4px);
+}
+
 .sidebar-link.active {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--accent-blue);
+    background: linear-gradient(90deg, rgba(0, 212, 255, 0.15) 0%, transparent 100%);
+    color: var(--accent-cyan);
+    border-left: 2px solid var(--accent-cyan);
 }
 
 .sidebar-link svg {
@@ -70,15 +81,11 @@ body {
     margin-right: 0.75rem;
 }
 
-/* Grid Layouts */
+/* Utils */
 .bento-grid {
     display: grid;
-    display: grid;
-    /* grid-template-columns: repeat(12, 1fr);  -- Moved to Tailwind classes for responsiveness */
     gap: 1.5rem;
     padding: 1.5rem;
-    /* height: 100vh; - Removed to allow flex container control */
-    /* overflow-y: auto; - Removed to allow internal card scrolling */
 }
 
 /* Animations */
@@ -86,11 +93,11 @@ body {
 
     0%,
     100% {
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
     }
 
     50% {
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
     }
 }
 
@@ -98,7 +105,28 @@ body {
     animation: pulse-glow 3s infinite;
 }
 
-/* Custom Scrollbar */
+.text-cyan-glow {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* Search Input */
+.search-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -108,14 +136,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
+    background: rgba(148, 163, 184, 0.2);
     border-radius: 3px;
 }
 
-/* Loader */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-cyan);
+}
+
 .loader {
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-top: 2px solid var(--accent-blue);
+    border-top: 2px solid var(--accent-cyan);
     border-radius: 50%;
     width: 16px;
     height: 16px;
