@@ -65,6 +65,7 @@ While many academic models achieve high accuracy, they remain "black boxes" acce
 ### 6. Advantages
 *   **High Precision:** ~92% accuracy with reduced false positives due to large-scale training.
 *   **Real-Time Scraping:** Can verify a website link instantly, not just pasted text.
+*   **Dynamic Learning:** Integrated feedback loop allows the model to become smarter without manual intervention.
 *   **Accountability:** Admin console tracks all user activity and flagged disputes.
 *   **Zero-Maintenance**: Cloud deployment implies no local server setup for end-users.
 
