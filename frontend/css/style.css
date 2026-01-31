@@ -61,6 +61,11 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: 0.5rem;
+    cursor: pointer;
+    /* Ensure pointer cursor */
+    z-index: 50;
+    /* Ensure high z-index */
+    position: relative;
 }
 
 .sidebar-link:hover {

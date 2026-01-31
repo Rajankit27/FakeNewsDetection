@@ -370,11 +370,28 @@ async function analyze() {
                         </p>
                     </div>
                 </div>
+
+                <!-- Feedback Section -->
+                <div id="feedbackSection" class="mb-6 flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5">
+                    <span class="text-sm text-slate-400">Do you agree with this analysis?</span>
+                    <div class="flex space-x-3">
+                        <button onclick="sendFeedback(true)" class="flex items-center space-x-2 px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 rounded-lg border border-teal-500/20 transition text-xs font-bold uppercase tracking-wider">
+                            <i data-lucide="thumbs-up" class="w-4 h-4"></i> <span>Agree</span>
+                        </button>
+                        <button onclick="sendFeedback(false)" class="flex items-center space-x-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition text-xs font-bold uppercase tracking-wider">
+                            <i data-lucide="thumbs-down" class="w-4 h-4"></i> <span>Disagree</span>
+                        </button>
+                    </div>
+                </div>
             `;
 
             // Clean up old reasoning block if exists
             const oldReasoning = document.getElementById('reasoningBlock');
             if (oldReasoning) oldReasoning.remove();
+
+            // Clean up old feedback section if exists
+            const oldFeedback = document.getElementById('feedbackSection');
+            if (oldFeedback) oldFeedback.remove();
 
             // Insert before XAI Section
             xaiSection.insertAdjacentHTML('beforebegin', reasoningHtml);
@@ -395,8 +412,8 @@ async function analyze() {
 
             if (window.lucide) lucide.createIcons();
 
-            // Store logId on closest container or keep global variable? 
-            // Better to attach to a fixed element like 'analyzeBtn' or just a global var for now in this scope
+            // Store logId on card for feedback
+            document.getElementById('resultCard').dataset.logId = data.log_id;
             window.lastLogId = data.log_id;
         }
 
@@ -461,42 +478,56 @@ function renderGlobalResults(results, synthesis) {
 
 async function sendFeedback(agree) {
     const card = document.getElementById('resultCard');
-    const logId = card.dataset.logId;
-
-    // Logic: If user Agree -> they confirm the result. If Disagree -> they claim opposite.
-    // We need to know what the result was to know what the 'correction' is.
-    // However, simplified: If Disagree, we flag for admin.
-
-    // The implementation plan specified sending user_rating.
-    // Let's assume we send 'DISPUTE' if disagree
+    // Fallback to window var if dataset missing (for safety)
+    const logId = card.dataset.logId || window.lastLogId;
+    const feedbackSection = document.getElementById('feedbackSection');
 
     if (agree) {
-        alert("Feedback recorded. Verification strength increased.");
-        card.classList.add('hidden');
+        if (feedbackSection) {
+            feedbackSection.innerHTML = `
+                <div class="flex items-center text-teal-400 space-x-2 w-full justify-center">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    <span class="font-medium">Feedback recorded. Model weights updated.</span>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
         return;
     }
 
     const correction = prompt("You disagreed. Is this content REAL or FAKE?", "REAL");
     if (!correction) return;
 
-    await fetch(`${API_BASE}/api/feedback`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            log_id: logId,
-            user_correction: correction.toUpperCase()
-        })
-    });
+    try {
+        await fetch(`${API_BASE}/api/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                log_id: logId,
+                user_correction: correction.toUpperCase()
+            })
+        });
 
-    alert("Dispute logged. Admin will review.");
-    card.classList.add('hidden');
+        if (feedbackSection) {
+            feedbackSection.innerHTML = `
+                <div class="flex items-center text-blue-400 space-x-2 w-full justify-center">
+                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    <span class="font-medium">Dispute logged. Sent for admin review.</span>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+    } catch (e) {
+        alert("Failed to submit feedback: " + e.message);
+    }
 }
 
 async function loadHistory() {
     const list = document.getElementById('historyList');
+    if (!list) return; // Guard clause if not on dashboard
     const res = await fetch(`${API_BASE}/api/user/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -508,7 +539,8 @@ async function loadHistory() {
 
     const logs = await res.json();
 
-    document.getElementById('totalScans').textContent = logs.length;
+    const totalEl = document.getElementById('totalScans');
+    if (totalEl) totalEl.textContent = logs.length;
 
     list.innerHTML = logs.map(log => {
         const isReal = log.prediction_result === 'REAL';
@@ -544,9 +576,6 @@ async function loadHistory() {
 // --- Admin Logic ---
 
 async function loadAdminStats() {
-    // Note: This endpoint does not exist yet in app.py logic above (I missed adding it in the massive replace).
-    // I will add it or mock it if needed. Wait, I DID add /api/admin/stats.
-
     const res = await fetch(`${API_BASE}/api/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -576,17 +605,141 @@ async function loadDisputes() {
     document.getElementById('disputeCount').textContent = disputes.length;
 
     const tbody = document.getElementById('disputeTableBody');
-    tbody.innerHTML = disputes.map(d => `
-        <tr class="hover:bg-white/5 transition">
-            <td class="px-6 py-4 truncate max-w-xs">${d.original_text}</td>
-            <td class="px-6 py-4 text-red-400">${d.model_pred}</td>
-            <td class="px-6 py-4 text-green-400">${d.user_claim}</td>
-            <td class="px-6 py-4">
-                <button class="text-blue-400 hover:text-white underline">Retrain</button>
-            </td>
-        </tr>
-    `).join('');
+    if (tbody) {
+        tbody.innerHTML = disputes.map(d => `
+            <tr class="hover:bg-white/5 transition">
+                <td class="px-6 py-4 truncate max-w-xs">${d.original_text}</td>
+                <td class="px-6 py-4 text-red-400">${d.model_pred}</td>
+                <td class="px-6 py-4 text-green-400">${d.user_claim}</td>
+                <td class="px-6 py-4">
+                    <button class="text-blue-400 hover:text-white underline">Retrain</button>
+                </td>
+            </tr>
+        `).join('');
+    }
 }
+
+// Admin View Switching
+function loadRetrainView() {
+    const container = document.getElementById('mainContent');
+    container.innerHTML = `
+        <h2 class="text-2xl font-bold mb-6 text-white">Model Retraining</h2>
+        <div class="glass-panel p-8 rounded-xl max-w-2xl">
+            <div class="flex items-start space-x-4">
+                <div class="p-3 bg-blue-500/10 rounded-lg">
+                     <i data-lucide="cpu" class="w-8 h-8 text-blue-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-100">Live Model Pipeline</h3>
+                    <p class="text-sm text-slate-400 mt-1 mb-4">
+                        Triggering a retrain will construct a new vectorized model using the latest labeled dataset and feedback loop entries. 
+                        This process runs in the background.
+                    </p>
+                    <div class="flex items-center space-x-4 mt-6">
+                        <button onclick="triggerRetrain()" id="retrainBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-lg shadow-blue-600/20 transition flex items-center">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> Start Training Sequence
+                        </button>
+                        <span id="retrainStatus" class="text-sm text-slate-400 italic"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 border-t border-white/5 pt-6">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Pipeline Configuration</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                        <span class="block text-xs text-slate-500">Algorithm</span>
+                        <span class="block text-sm font-mono text-slate-300">LogisticRegression (LibLinear)</span>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                        <span class="block text-xs text-slate-500">Vectorizer</span>
+                        <span class="block text-sm font-mono text-slate-300">TF-IDF (1-2 ngrams)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+}
+
+async function triggerRetrain() {
+    const btn = document.getElementById('retrainBtn');
+    const status = document.getElementById('retrainStatus');
+
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Initializing...`;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/retrain`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            status.textContent = data.msg;
+            status.className = "text-sm text-teal-400 font-medium italic";
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 mr-2"></i> Sequence Started`;
+        } else {
+            throw new Error(data.msg);
+        }
+    } catch (e) {
+        alert("Error: " + e.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i> Retry`;
+    }
+}
+
+
+async function loadUserManagementView() {
+    const container = document.getElementById('mainContent');
+    container.innerHTML = '<div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div></div>'; // Loading state
+
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/users`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const users = await res.json();
+
+        container.innerHTML = `
+            <h2 class="text-2xl font-bold mb-6 text-white">User Management</h2>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <table class="w-full text-left text-sm text-slate-400">
+                    <thead class="bg-white/5 text-slate-200 uppercase text-xs font-bold">
+                        <tr>
+                            <th class="px-6 py-4">Username</th>
+                            <th class="px-6 py-4">Role</th>
+                            <th class="px-6 py-4">Created At</th>
+                            <th class="px-6 py-4 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        ${users.map(u => `
+                        <tr class="hover:bg-white/5 transition">
+                            <td class="px-6 py-4 font-medium text-white">${u.username}</td>
+                             <td class="px-6 py-4">
+                                <span class="px-2 py-1 rounded text-xs font-bold uppercase ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-300'}">
+                                    ${u.role}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-mono text-xs">${u.created_at}</td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="flex items-center justify-end text-teal-400 text-xs font-bold uppercase">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mr-2"></span> Active
+                                </span>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+    } catch (e) {
+        container.innerHTML = `<p class="text-red-400">Error loading users: ${e.message}</p>`;
+    }
+}
+
 
 function analyzeTicker(url) {
     setMode('url');

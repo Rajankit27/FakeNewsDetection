@@ -9,6 +9,8 @@ import os
 import re
 import datetime
 import requests
+import subprocess
+import sys
 from bs4 import BeautifulSoup
 import nltk
 from nltk.corpus import stopwords
@@ -488,6 +490,43 @@ def admin_disputes():
         })
         
     return jsonify(clean_disputes), 200
+
+@app.route('/api/admin/retrain', methods=['POST'])
+@jwt_required()
+def admin_retrain():
+    # Verify Admin
+    claims = get_jwt_identity() # In prod check role
+
+    try:
+        # Run training script in background
+        # Using sys.executable to ensure we use the same python interpreter
+        # Assuming train_model.py is in ../ml/ relative to backend or we use absolute path
+        # Current file is backend/app.py. ml/ is sibling to backend.
+        
+        script_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ml', 'train_model.py')
+        
+        # We use Popen for non-blocking
+        subprocess.Popen([sys.executable, script_path])
+        
+        return jsonify({"msg": "Retraining process started based on latest data."}), 200
+    except Exception as e:
+        return jsonify({"msg": f"Failed to start training: {str(e)}"}), 500
+
+@app.route('/api/admin/users', methods=['GET'])
+@jwt_required()
+def admin_users():
+    users = list(users_col.find({}, {"password_hash": 0})) # Exclude password
+    
+    clean_users = []
+    for u in users:
+        clean_users.append({
+            "id": str(u['_id']),
+            "username": u['username'],
+            "role": u.get('role', 'user'),
+            "created_at": u.get('created_at', datetime.datetime.utcnow()).strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+    return jsonify(clean_users), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
