@@ -1,8 +1,8 @@
 # Software Requirements Specification (SRS)
 ## TruthLens AI - Fake News Detection System
 
-**Version:** 3.0 (Final Release)  
-**Date:** 2026-01-25  
+**Version:** 3.1 (Enhanced Release)  
+**Date:** 2026-01-31  
 **Status:** Deployed & Operational  
 
 ---
@@ -17,6 +17,7 @@ TruthLens AI is a secure, full-stack web application that allows authorized agen
 **Key Modules:**
 - **Secure Authentication**: JWT-based Login/Registration.
 - **Command Center Dashboard**: Real-time analysis with "Bento Grid" layout.
+- **Feedback Loop**: User-driven reinforcement learning (Agree/Disagree ratings).
 - **Admin Console**: System oversight, model retraining triggers, and dispute management.
 - **Intelligence Log**: History tracking for all investigations.
 
@@ -60,10 +61,12 @@ TruthLens AI is a secure, full-stack web application that allows authorized agen
 - **Text Analysis**: Direct input processing via ML Pipeline (TF-IDF -> LogReg).
 - **URL Analysis**: Web scraping module extracts text from a given URL.
 - **Global Search**: Fetches recent news metadata from external News APIs.
+- **Feedback Mechanism**: Users can rate analysis results (Agree/Disagree) to improve model accuracy.
 - **XAI (Explainable AI)**: Highlights contributing words (e.g., "shocking", "breaking") that influenced the prediction.
 
 #### FR-04: Admin Console
 - **Telemetry**: Displays aggregate statistics (Active Users, API Latency).
+- **Model Retraining**: Pipeline to re-vectorize data and update model weights based on new feedback.
 - **Dispute Queue**: Lists user-reported misclassifications for future model retraining.
 
 ### 3.2 Non-Functional Requirements (NFR)

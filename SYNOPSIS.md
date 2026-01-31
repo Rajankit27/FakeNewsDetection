@@ -2,8 +2,8 @@
 ## TruthLens AI - Fake News Detection System
 
 **Topic:** AI-Powered Misinformation Analysis & Verification Platform  
-**Version:** 3.0 (Final)  
-**Date:** 2026-01-25
+**Version:** 3.1 (Enhanced)  
+**Date:** 2026-01-31
 
 ---
 
@@ -27,6 +27,7 @@ graph LR
 The primary objectives of TruthLens AI are:
 *   **Multi-Modal Verification:** To detect fake news not just from text, but also from direct web URLs and global search queries.
 *   **Explainable AI (XAI):** To provide transparency by highlighting the exact words ("shocking", "breaking") that triggered a "FAKE" classification.
+*   **Feedback Loop:** To allow users to rate predictions, enabling the system to learn and adapt to new misinformation trends over time.
 *   **Secure Environment:** To implement Role-Based Access Control (RBAC) ensuring only authorized agents and admins can access sensitive intelligence logs.
 *   **Production Deployment:** To host the solution on a scalable cloud infrastructure (**Render**) with concurrent request handling (**Gunicorn**).
 
