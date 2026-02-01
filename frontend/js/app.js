@@ -110,6 +110,64 @@ function initDashboard() {
     initSearch();
 }
 
+// Init Header Interactions
+initHeaderInteractions();
+
+// Load Settings
+loadSettings();
+
+function initHeaderInteractions() {
+    const notifyBtn = document.getElementById('notifyBtn');
+    const settingsBtn = document.getElementById('settingsBtn');
+
+    if (notifyBtn) {
+        notifyBtn.addEventListener('click', () => {
+            // Simple toast simulation
+            const original = notifyBtn.innerHTML;
+            notifyBtn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-green-400"></i>`;
+            lucide.createIcons();
+            setTimeout(() => {
+                notifyBtn.innerHTML = original;
+                lucide.createIcons();
+            }, 2000);
+        });
+    }
+
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            toggleSettingsModal();
+        });
+    }
+}
+
+function toggleSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
+function loadSettings() {
+    // Load saved settings
+    const notify = localStorage.getItem('setting_notify');
+    const saver = localStorage.getItem('setting_saver');
+
+    const notifyInput = document.getElementById('settingNotify');
+    const saverInput = document.getElementById('settingsaver');
+
+    if (notifyInput) {
+        if (notify !== null) notifyInput.checked = notify === 'true';
+        notifyInput.addEventListener('change', (e) => localStorage.setItem('setting_notify', e.target.checked));
+    }
+
+    if (saverInput) {
+        if (saver !== null) saverInput.checked = saver === 'true';
+        saverInput.addEventListener('change', (e) => localStorage.setItem('setting_saver', e.target.checked));
+    }
+}
+
 let scanChartInstance = null;
 let confChartInstance = null;
 
