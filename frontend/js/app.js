@@ -149,6 +149,23 @@ function toggleSettingsModal() {
     }
 }
 
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+
+    if (sidebar.classList.contains('-translate-x-full')) {
+        // Open
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+        // Re-initialize icons just in case
+        if (window.lucide) lucide.createIcons();
+    } else {
+        // Close
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+    }
+}
+
 function loadSettings() {
     // Load saved settings
     const notify = localStorage.getItem('setting_notify');
