@@ -201,8 +201,8 @@ function initCharts() {
             labels: dataPoints.map((_, i) => i),
             datasets: [{
                 data: dataPoints,
-                borderColor: '#00d4ff',
-                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                borderColor: '#0284C7',
+                backgroundColor: 'rgba(2, 132, 199, 0.1)',
                 borderWidth: 2,
                 pointRadius: 0,
                 fill: true,
@@ -225,7 +225,7 @@ function initCharts() {
             labels: ['Confidence', 'Remaining'],
             datasets: [{
                 data: [0, 100],
-                backgroundColor: ['#00d4ff', 'rgba(255, 255, 255, 0.1)'],
+                backgroundColor: ['#0284C7', 'rgba(0, 0, 0, 0.05)'],
                 borderWidth: 0,
                 cutout: '75%'
             }]
@@ -242,8 +242,8 @@ function updateConfChart(value, isReal) {
     if (confChartInstance) {
         confChartInstance.data.datasets[0].data = [value, 100 - value];
         confChartInstance.data.datasets[0].backgroundColor = [
-            isReal ? '#00d4ff' : '#ff3366',
-            'rgba(255, 255, 255, 0.1)'
+            isReal ? '#0284C7' : '#DC2626',
+            'rgba(0, 0, 0, 0.05)'
         ];
         confChartInstance.update();
     }
@@ -431,16 +431,16 @@ async function analyze() {
 
             // Insert Reasoning Block
             let reasoningHtml = `
-                <div id="reasoningBlock" class="mb-6 relative overflow-hidden rounded-xl border border-blue-500/30 bg-slate-900/80 shadow-lg shadow-blue-500/10">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-teal-500/10 pointer-events-none"></div>
+                <div id="reasoningBlock" class="mb-6 relative overflow-hidden rounded-xl border border-sky-200 bg-sky-50 shadow-lg shadow-sky-500/10">
+                    <div class="absolute inset-0 bg-gradient-to-r from-sky-500/5 to-teal-500/5 pointer-events-none"></div>
                     <div class="p-5 relative z-10">
                         <div class="flex items-center mb-3">
-                             <div class="p-1.5 bg-blue-500/20 rounded-lg mr-3">
-                                 <i data-lucide="brain-circuit" class="w-5 h-5 text-blue-400"></i>
+                             <div class="p-1.5 bg-sky-500/10 rounded-lg mr-3">
+                                 <i data-lucide="brain-circuit" class="w-5 h-5 text-sky-600"></i>
                              </div>
-                             <h4 class="text-xs font-bold text-blue-300 uppercase tracking-widest">AI Insight & Analysis</h4>
+                             <h4 class="text-xs font-bold text-sky-700 uppercase tracking-widest">AI Insight & Analysis</h4>
                         </div>
-                        <p class="text-base text-slate-100 leading-relaxed font-medium">
+                        <p class="text-base text-slate-700 leading-relaxed font-medium">
                             ${data.reasoning || "Analysis complete. Integrity verified against known linguistic patterns."}
                         </p>
                     </div>
@@ -517,11 +517,11 @@ function renderGlobalResults(results, synthesis) {
     // 1. AI Synthesis Section (Analysis)
     if (synthesis) {
         html += `
-        <div class="mb-4 bg-blue-600/10 border border-blue-500/20 p-4 rounded-xl">
-            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center">
+        <div class="mb-4 bg-sky-50 border border-sky-200 p-4 rounded-xl shadow-sm">
+            <h4 class="text-xs font-bold text-sky-700 uppercase tracking-widest mb-2 flex items-center">
                 <i data-lucide="bot" class="w-3 h-3 mr-2"></i> AI Synthesis
             </h4>
-            <p class="text-sm text-slate-200 leading-relaxed font-sans">
+            <p class="text-sm text-slate-700 leading-relaxed font-sans">
                 ${synthesis}
             </p>
         </div>
@@ -531,16 +531,16 @@ function renderGlobalResults(results, synthesis) {
 
     // 2. Articles List
     html += results.map(r => `
-        <div class="bg-slate-800/50 p-3 rounded-lg border border-white/5 flex justify-between items-start hover:bg-white/5 transition">
+        <div class="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-start hover:bg-slate-50 transition shadow-sm">
             <div>
                  <div class="flex items-center space-x-2">
-                    <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">${r.source}</span>
-                    <span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${r.prediction === 'REAL' ? 'bg-teal-500/20 text-teal-400' : 'bg-red-500/20 text-red-400'}">${r.badge}</span>
+                    <span class="text-[10px] font-bold text-sky-600 uppercase tracking-wider">${r.source}</span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${r.prediction === 'REAL' ? 'bg-teal-50 text-teal-600 border border-teal-100' : 'bg-red-50 text-red-600 border border-red-100'}">${r.badge}</span>
                  </div>
-                 <h4 class="text-sm font-medium text-slate-200 mt-1 leading-snug">${r.title}</h4>
+                 <h4 class="text-sm font-medium text-slate-700 mt-1 leading-snug">${r.title}</h4>
             </div>
             <div class="text-right ml-4">
-                 <span class="text-xs font-bold ${r.prediction === 'REAL' ? 'text-teal-400' : 'text-red-400'}">${Math.round(r.confidence)}%</span>
+                 <span class="text-xs font-bold ${r.prediction === 'REAL' ? 'text-teal-600' : 'text-red-500'}">${Math.round(r.confidence)}%</span>
             </div>
         </div>
     `).join('');
@@ -628,20 +628,20 @@ async function loadHistory() {
         else if (txt.includes("money") || txt.includes("economy")) icon = "💰";
 
         return `
-        <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition group cursor-pointer relative overflow-hidden">
+        <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 transition group cursor-pointer relative overflow-hidden shadow-sm">
              <!-- ID Badge background -->
              <div class="absolute left-0 top-0 bottom-0 w-1 ${isReal ? 'bg-teal-500' : 'bg-red-500'}"></div>
              
              <div class="flex items-center space-x-3 w-full pl-2">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-lg shadow-sm border border-white/10">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-lg shadow-sm border border-slate-200">
                     ${icon}
                 </div>
                 <div class="truncate flex-1 mr-3">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-[10px] text-slate-500 font-mono">${new Date(log.timestamp).toLocaleTimeString()}</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${isReal ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}">${log.prediction_result}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${isReal ? 'bg-teal-50 text-teal-600 border border-teal-100' : 'bg-red-50 text-red-600 border border-red-100'}">${log.prediction_result}</span>
                     </div>
-                    <p class="text-xs text-slate-300 truncate group-hover:text-white transition font-medium">${log.text_content}</p>
+                    <p class="text-xs text-slate-700 truncate group-hover:text-blue-600 transition font-medium">${log.text_content}</p>
                 </div>
              </div>
         </div>`;
@@ -846,10 +846,10 @@ async function initNewsTicker() {
                       <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                     </span>
                     <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest flex-shrink-0">LIVE</span>
-                    <span class="text-slate-500 text-[10px] uppercase border-r border-slate-700 pr-2 mr-2 flex-shrink-0">${art.source}</span>
-                    <span class="text-sm font-medium text-slate-200 truncate hover:text-white transition">${art.title}</span>
+                    <span class="text-slate-400 text-[10px] uppercase border-r border-slate-300 pr-2 mr-2 flex-shrink-0">${art.source}</span>
+                    <span class="text-sm font-medium text-slate-700 truncate hover:text-sky-600 transition">${art.title}</span>
                 </div>
-                <button onclick="analyzeTicker('${art.link}')" class="flex-shrink-0 ml-4 text-[10px] bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1 rounded border border-blue-500/20 transition whitespace-nowrap">
+                <button onclick="analyzeTicker('${art.link}')" class="flex-shrink-0 ml-4 text-[10px] bg-sky-50 hover:bg-sky-100 text-sky-600 px-3 py-1 rounded border border-sky-200 transition whitespace-nowrap font-medium shadow-sm">
                     Verify Now
                 </button>
             </div>

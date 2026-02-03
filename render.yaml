@@ -1,5 +1,5 @@
 services:
-  # Updated for TruthLens UI Enhancements
+  # Updated for TruthLens UI Enhancements & Team Footer
   - type: web
     name: fake-news-detector
     env: python

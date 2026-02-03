@@ -10,69 +10,69 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="text-white min-h-screen">
+<body class="text-slate-900 min-h-screen bg-slate-50">
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 glass-panel border-r border-white/5 flex flex-col z-50 relative">
+        <aside class="w-64 glass-panel border-r border-slate-200 flex flex-col z-50 relative">
             <div class="p-6">
                 <h1
-                    class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">
+                    class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-sky-400">
                     Admin Console</h1>
                 <p class="text-xs text-slate-500 font-mono mt-1">System Oversight</p>
             </div>
             <nav class="flex-grow px-4 space-y-2 mt-4">
                 <a href="javascript:void(0)" onclick="location.reload()"
-                    class="block px-4 py-3 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm font-medium border border-cyan-500/20">Overview</a>
+                    class="block px-4 py-3 bg-sky-50 text-sky-600 rounded-lg text-sm font-medium border border-sky-100">Overview</a>
                 <a href="javascript:void(0)" onclick="loadRetrainView()"
-                    class="block px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">Model
+                    class="block px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg text-sm font-medium transition">Model
                     Retraining</a>
                 <a href="javascript:void(0)" onclick="loadUserManagementView()"
-                    class="block px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg text-sm font-medium transition">User
+                    class="block px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg text-sm font-medium transition">User
                     Management</a>
             </nav>
-            <div class="p-4 border-t border-white/10">
+            <div class="p-4 border-t border-slate-200">
                 <button onclick="logout()"
-                    class="w-full text-center text-xs text-red-400 hover:text-red-300 transition">Terminate
+                    class="w-full text-center text-xs text-red-600 hover:text-red-700 transition">Terminate
                     Session</button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-8 relative">
+        <main class="flex-1 overflow-y-auto p-8 relative bg-slate-50">
             <!-- Background Elements -->
             <div class="absolute inset-0 z-0 opacity-10 pointer-events-none"
                 style="background-image: radial-gradient(var(--accent-cyan) 1px, transparent 1px); background-size: 24px 24px;">
             </div>
 
             <div class="relative z-10" id="mainContent">
-                <h2 class="text-2xl font-bold mb-6 text-white">System Telemetry</h2>
+                <h2 class="text-2xl font-bold mb-6 text-slate-900">System Telemetry</h2>
 
                 <!-- Stats Row -->
                 <div class="grid grid-cols-3 gap-6 mb-8">
                     <div class="glass-panel p-6 rounded-xl">
-                        <p class="text-xs text-slate-400 uppercase font-bold">Total API Calls</p>
-                        <p id="adminTotal" class="text-3xl font-bold mt-2 font-mono">Loading...</p>
+                        <p class="text-xs text-slate-500 uppercase font-bold">Total API Calls</p>
+                        <p id="adminTotal" class="text-3xl font-bold mt-2 font-mono text-slate-800">Loading...</p>
                     </div>
                     <div class="glass-panel p-6 rounded-xl">
-                        <p class="text-xs text-slate-400 uppercase font-bold">Fake News Rate</p>
-                        <p id="adminFakeRate" class="text-3xl font-bold mt-2 text-red-400 font-mono">Loading...</p>
+                        <p class="text-xs text-slate-500 uppercase font-bold">Fake News Rate</p>
+                        <p id="adminFakeRate" class="text-3xl font-bold mt-2 text-red-600 font-mono">Loading...</p>
                     </div>
                     <div class="glass-panel p-6 rounded-xl">
-                        <p class="text-xs text-slate-400 uppercase font-bold">Active Agents</p>
-                        <p id="adminUsers" class="text-3xl font-bold mt-2 text-cyan-400 font-mono">Loading...</p>
+                        <p class="text-xs text-slate-500 uppercase font-bold">Active Agents</p>
+                        <p id="adminUsers" class="text-3xl font-bold mt-2 text-sky-600 font-mono">Loading...</p>
                     </div>
                 </div>
 
                 <!-- Dispute Table -->
-                <h2 class="text-xl font-bold mb-4 flex items-center">
+                <h2 class="text-xl font-bold mb-4 flex items-center text-slate-900">
                     Dispute Queue
                     <span id="disputeCount"
                         class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-mono">0</span>
                 </h2>
                 <div class="glass-panel rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-sm text-slate-400">
-                        <thead class="bg-white/5 text-slate-200 uppercase text-xs font-bold">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold">
                             <tr>
                                 <th class="px-6 py-4">Original Text</th>
                                 <th class="px-6 py-4">System Pred</th>
@@ -80,11 +80,32 @@
                                 <th class="px-6 py-4">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="disputeTableBody" class="divide-y divide-white/5">
+                        <tbody id="disputeTableBody" class="divide-y divide-slate-200">
                             <!-- Rows -->
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Footer -->
+                <footer class="mt-8 border-t border-slate-200 py-8 bg-white/50 backdrop-blur-xl">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-slate-500">
+                        <!-- Column 1: Branding -->
+                        <div>
+                            <div class="flex items-center space-x-2 mb-3">
+                                <span class="font-bold text-slate-800 text-sm">TruthLens AI</span>
+                            </div>
+                            <p class="leading-relaxed opacity-80">
+                                System Oversight Console
+                            </p>
+                        </div>
+
+                        <!-- Column 2: Disclaimer -->
+                        <div class="md:col-span-2 md:text-right">
+                            <p>© 2026 TruthLens AI. v2.4.0</p>
+                            <p class="opacity-60">Restricted Access. Authorized Personnel Only.</p>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </main>
     </div>
