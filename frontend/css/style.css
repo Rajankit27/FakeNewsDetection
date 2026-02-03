@@ -23,6 +23,30 @@
     --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 }
 
+[data-theme="dark"] {
+    --bg-light: #0f172a;
+    /* Slate 900 */
+    --bg-white: #1e293b;
+    /* Slate 800 */
+    --glass-panel: #1e293b;
+    --glass-border: #334155;
+    /* Slate 700 */
+
+    --accent-cyan: #38bdf8;
+    /* Sky 400 */
+    --accent-purple: #a78bfa;
+    /* Violet 400 */
+    --accent-red: #f87171;
+    /* Red 400 */
+
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #94a3b8;
+    /* Slate 400 */
+
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
 body {
     font-family: var(--font-main);
     background: #F1F5F9;

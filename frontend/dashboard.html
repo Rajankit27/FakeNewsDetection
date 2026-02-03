@@ -377,19 +377,19 @@
     </main>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-50 hidden">
+    <div id="settingsModal" class="fixed inset-0 z-[60] hidden">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleSettingsModal()">
         </div>
 
         <!-- Modal Content -->
         <div
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md glass-panel no-hover rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all scale-100">
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md glass-panel rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-700 transform transition-all scale-100">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-white flex items-center">
-                    <i data-lucide="settings" class="w-5 h-5 mr-3 text-cyan-400"></i> Settings
+                <h2 class="text-xl font-bold flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-3 text-sky-500"></i> Settings
                 </h2>
-                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white transition">
+                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-sky-500 transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -398,13 +398,13 @@
                 <!-- Setting Item: Notifications -->
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-slate-200">System Notifications</p>
+                        <p class="text-sm font-medium">System Notifications</p>
                         <p class="text-xs text-slate-500">Enable real-time threat alerts</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="settingNotify" class="sr-only peer" checked>
                         <div
-                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500">
+                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-500">
                         </div>
                     </label>
                 </div>
@@ -412,35 +412,34 @@
                 <!-- Setting Item: Data Saver -->
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-slate-200">Low Bandwidth Mode</p>
+                        <p class="text-sm font-medium">Low Bandwidth Mode</p>
                         <p class="text-xs text-slate-500">Reduce animation complexity</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="settingsaver" class="sr-only peer">
                         <div
-                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500">
+                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-500">
                         </div>
                     </label>
                 </div>
 
-                <!-- Setting Item: Dark Mode (Visual Only) -->
-                <div class="flex items-center justify-between opacity-50 cursor-not-allowed"
-                    title="System locked to Dark Mode">
+                <!-- Setting Item: Dark Mode -->
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-slate-200">Dark Interface</p>
-                        <p class="text-xs text-slate-500">Enforced by security policy</p>
+                        <p class="text-sm font-medium">Dark Mode</p>
+                        <p class="text-xs text-slate-500">Toggle interface theme</p>
                     </div>
-                    <label class="relative inline-flex items-center cursor-not-allowed">
-                        <input type="checkbox" class="sr-only peer" checked disabled>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="themeToggle" class="sr-only peer">
                         <div
-                            class="w-11 h-6 bg-slate-700 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-5 after:w-5 peer-checked:bg-slate-600">
+                            class="w-11 h-6 bg-slate-200 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 peer-checked:bg-slate-600">
                         </div>
                     </label>
                 </div>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-white/10 text-center">
-                <p class="text-xs text-slate-600 font-mono">TruthLens AI v2.4.0 Build 8892</p>
+            <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 text-center">
+                <p class="text-xs text-slate-500 font-mono">TruthLens AI v2.4.0 Build 8892</p>
             </div>
         </div>
     </div>

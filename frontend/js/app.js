@@ -67,6 +67,35 @@ function initAuth() {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('role', data.role);
                     localStorage.setItem('username', data.username);
+                    // Theme Initialization
+                    const themeToggle = document.getElementById('themeToggle');
+                    const savedTheme = localStorage.getItem('theme');
+                    const htmlEl = document.documentElement;
+
+                    if (savedTheme === 'dark') {
+                        htmlEl.setAttribute('data-theme', 'dark');
+                        if (themeToggle) themeToggle.checked = true;
+                    } else {
+                        htmlEl.removeAttribute('data-theme');
+                        if (themeToggle) themeToggle.checked = false;
+                    }
+
+                    if (themeToggle) {
+                        themeToggle.addEventListener('change', () => {
+                            if (themeToggle.checked) {
+                                htmlEl.setAttribute('data-theme', 'dark');
+                                localStorage.setItem('theme', 'dark');
+                            } else {
+                                htmlEl.removeAttribute('data-theme');
+                                localStorage.setItem('theme', 'light');
+                            }
+                        });
+                    }
+
+                    // Sidebar Logic
+                    if (localStorage.getItem('sidebarOpen') === 'true' && window.innerWidth >= 1024) {
+                        // No action needed here, sidebar state is handled by initDashboard
+                    }
                     window.location.href = data.role === 'admin' ? 'admin.html' : 'dashboard.html';
                 }
             } else {
@@ -173,6 +202,31 @@ function loadSettings() {
 
     const notifyInput = document.getElementById('settingNotify');
     const saverInput = document.getElementById('settingsaver');
+
+    // Theme Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    const htmlEl = document.documentElement;
+
+    if (savedTheme === 'dark') {
+        htmlEl.setAttribute('data-theme', 'dark');
+        if (themeToggle) themeToggle.checked = true;
+    } else {
+        htmlEl.removeAttribute('data-theme');
+        if (themeToggle) themeToggle.checked = false;
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                htmlEl.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlEl.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
 
     if (notifyInput) {
         if (notify !== null) notifyInput.checked = notify === 'true';
