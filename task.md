@@ -8,3 +8,5 @@
 - [x] Deploy on Render <!-- id: 5 -->
 - [x] Update SRS with complete system details
 - [x] Update SYNOPSIS.md to match final system
+
+- [x] Add "About Project" modal in footer details <!-- id: 6 -->

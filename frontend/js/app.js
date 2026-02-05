@@ -178,6 +178,16 @@ function toggleSettingsModal() {
     }
 }
 
+function toggleAboutModal() {
+    const modal = document.getElementById('aboutModal');
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons(); // Refresh icons inside modal
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
