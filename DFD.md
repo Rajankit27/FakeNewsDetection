@@ -1,6 +1,6 @@
 # Data Flow Diagram (DFD) - Level 1 Explanation
 
-This document explains the flow of data through the **TruthLens AI** system, corresponding to the Level 1 DFD.
+This document explains the flow of data through the **TruthLens Intelligence** system, corresponding to the Level 1 DFD.
 
 ## 1. External Entity: User / Admin
 *   **Role:** The source of data.

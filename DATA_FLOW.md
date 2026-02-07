@@ -1,6 +1,6 @@
 # Data Flow Diagram (DFD) & Explanation
 
-This document details the flow of data within the TruthLens AI system, from user input to the final fake news detection result.
+This document details the flow of data within the TruthLens Intelligence system, from user input to the final fake news detection result.
 
 ## 1. Visual Overview
 ![Visual Data Flow](truthlens_data_flow_visual.png)

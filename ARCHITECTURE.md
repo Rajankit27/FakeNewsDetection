@@ -1,4 +1,4 @@
-# TruthLens AI: System Architecture & Workflow
+# TruthLens Intelligence: System Architecture & Workflow
 
 ## 1. System Architecture Diagram
 
@@ -9,7 +9,7 @@
 
 ## 2. Architecture Overview
 
-TruthLens AI operates on a modern, monolithic architecture designed for speed and simplicity. It consists of four primary layers:
+TruthLens Intelligence operates on a modern, monolithic architecture designed for speed and simplicity. It consists of four primary layers:
 
 ### A. The User Layer (Client)
 *   **User Interface (UI):** A responsive web dashboard featuring a "Bento Grid" layout. It handles user inputs (text/URL) and displays results with visual indicators (colors, icons).

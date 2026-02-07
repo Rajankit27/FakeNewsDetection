@@ -1,5 +1,5 @@
 # PROJECT SYNOPSIS
-## TruthLens AI - Fake News Detection System
+## TruthLens Intelligence - Fake News Detection System
 
 **Topic:** AI-Powered Misinformation Analysis & Verification Platform  
 **Version:** 3.1 (Enhanced)  
@@ -8,7 +8,7 @@
 ---
 
 ### 1. Introduction
-"TruthLens AI" is an enterprise-grade web application designed to combat the spread of misinformation in the digital age. Unlike basic text classifiers, this system offers a comprehensive integrity verification suite. It combines advanced Machine Learning (Logistic Regression & TF-IDF) with real-time web scraping and global API integration to cross-reference news from multiple sources. The platform features a secured "Command Center" dashboard, allowing authorized agents to investigate text, URLs, and global trends instanttly.
+"TruthLens Intelligence" is an enterprise-grade web application designed to combat the spread of misinformation in the digital age. Unlike basic text classifiers, this system offers a comprehensive integrity verification suite. It combines advanced Machine Learning (Logistic Regression & TF-IDF) with real-time web scraping and global API integration to cross-reference news from multiple sources. The platform features a secured "Command Center" dashboard, allowing authorized agents to investigate text, URLs, and global trends instanttly.
 
 **System Flowchart:**
 
@@ -24,7 +24,7 @@ graph LR
 ```
 
 ### 2. Objective
-The primary objectives of TruthLens AI are:
+The primary objectives of TruthLens Intelligence are:
 *   **Multi-Modal Verification:** To detect fake news not just from text, but also from direct web URLs and global search queries.
 *   **Explainable AI (XAI):** To provide transparency by highlighting the exact words ("shocking", "breaking") that triggered a "FAKE" classification.
 *   **Feedback Loop:** To allow users to rate predictions, enabling the system to learn and adapt to new misinformation trends over time.
@@ -49,7 +49,7 @@ The primary objectives of TruthLens AI are:
 ### 4. Research Gap & Innovation
 While many academic models achieve high accuracy, they remain "black boxes" accessible only to data scientists.
 *   **The Gap:** Lack of accessible, interpretable, and production-ready tools for verifying everyday news.
-*   **Our Innovation:** TruthLens AI integrates a **Bento Grid Dashboard** user interface with **XAI visualizers**, bridging the gap between complex model inference and user-friendly usage. It adds a layer of "Live Intelligence" that static datasets cannot provide.
+*   **Our Innovation:** TruthLens Intelligence integrates a **Bento Grid Dashboard** user interface with **XAI visualizers**, bridging the gap between complex model inference and user-friendly usage. It adds a layer of "Live Intelligence" that static datasets cannot provide.
 
 ### 5. Project Timeline
 

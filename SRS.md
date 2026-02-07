@@ -1,5 +1,5 @@
 # Software Requirements Specification (SRS)
-## TruthLens AI - Fake News Detection System
+## TruthLens Intelligence - Fake News Detection System
 
 **Version:** 3.1 (Enhanced Release)  
 **Date:** 2026-01-31  
@@ -10,10 +10,10 @@
 ## 1. Introduction
 
 ### 1.1 Purpose
-This document defines the complete functional and non-functional requirements for "TruthLens AI", an enterprise-grade fake news detection platform. It details the system architecture, user roles (Agent vs Admin), security protocols, and deployment status.
+This document defines the complete functional and non-functional requirements for "TruthLens Intelligence", an enterprise-grade fake news detection platform. It details the system architecture, user roles (Agent vs Admin), security protocols, and deployment status.
 
 ### 1.2 Scope
-TruthLens AI is a secure, full-stack web application that allows authorized agents to verification the credibility of text, URLs, and global news trends using advanced machine learning.
+TruthLens Intelligence is a secure, full-stack web application that allows authorized agents to verification the credibility of text, URLs, and global news trends using advanced machine learning.
 **Key Modules:**
 - **Secure Authentication**: JWT-based Login/Registration.
 - **Command Center Dashboard**: Real-time analysis with "Bento Grid" layout.

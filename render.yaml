@@ -1,7 +1,7 @@
 services:
   # Updated for TruthLens UI Enhancements & Team Footer
   - type: web
-    name: fake-news-detector
+    name: truthlens-intelligence
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt && python -m nltk.downloader stopwords wordnet omw-1.4 && python ml/train_model.py"

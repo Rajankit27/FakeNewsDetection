@@ -1,6 +1,6 @@
 # Entity Relationship Diagram (ERD)
 
-This is the simplified database model for **TruthLens AI**. It shows how the 3 main parts of our database (User, Analysis, Feedback) talk to each other.
+This is the simplified database model for **TruthLens Intelligence**. It shows how the 3 main parts of our database (User, Analysis, Feedback) talk to each other.
 
 ![ER Diagram](truthlens_er_diagram_simple.png)
 

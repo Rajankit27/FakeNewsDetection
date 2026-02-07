@@ -30,7 +30,7 @@ DESIGN REQUIREMENTS:
 
 DASHBOARD SECTIONS:
 1. Sidebar Navigation:
-   - Logo area with "TruthLens AI" branding
+   - Logo area with "TruthLens Intelligence" branding
    - Navigation menu items: Dashboard, Analyze, Intelligence Log, Admin Console
    - Active state indicators
    - Smooth hover effects
